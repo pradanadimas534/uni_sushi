@@ -37,7 +37,7 @@ export const DEV_DATA = {
   items: [
     // Breakfast, Brunch & Lunch
     { id: 1, category_id: 1, name: 'Full English Brekky', description: 'Eggs, bacon, sausage, hash brown, baked beans, grilled tomato, toast.', tag: '', featured: true, image: '' },
-    { id: 2, category_id: 1, name: 'Egg benny', description: 'Toasted Muffin, Poached Eggs, Baby Spinach, Hollandaise Sauce', tag: '', Image: '' },
+    { id: 2, category_id: 1, name: 'Egg benny', description: 'Toasted Muffin, Poached Eggs, Baby Spinach, Hollandaise Sauce', tag: '', image: '' },
     { id: 3, category_id: 1, name: 'Big boy warp', description: 'Homemade Beef Patty, Bacon, Has Brown, Scrambled egg, cheese', image: ''},
     { id: 4, category_id: 1, name: 'Uni Brekky Burger', description: 'Homemade Beef Patty, Fried Egg, Hash Brown, Cheese, Burger Bun', image: ''},
     { id: 5, category_id: 1, name: 'Croissant Stacker', description: 'Croissant, Fried Egg, Ham, Cheese, Fresh Tomato, Basil, Avocado Smash', image: ''},
@@ -55,6 +55,35 @@ export const DEV_DATA = {
     { id: 16, category_id: 2, name: 'Thai Green Curry', description: 'spicy green curry, coconut cream, steamed rice', image: ''},
     { id: 17, category_id: 2, name: 'Beef Bulgogi', description: 'marinated beef, steamed rice', image: ''},
     { id: 18, category_id: 2, name: 'Traditional Chicken Parmigiana', descriptin: 'crumbed chicken breast, parmesan, melted cheese, steamed rice', image: ''},
-    { id: 19, category_id: 2,}
+    { id: 19, category_id: 2, name: 'Chicken Schnitzel', description: 'crumbed chicken, parsley, lemon zest, steamed vegetables, mushroom sauce', image: ''},
+    { id: 20, category_id: 2, name: 'Chicken Cordon Bleu', description: 'crumbed chicken, ham, cheese, mashed potato, vegetables, mushroom sauce', image: ''},
+    { id: 21, category_id: 2, name: 'Chicken Grilled', description: 'marinated grilled chicken, rice, salad, sauce of choice', image: ''},
+    { id: 22, category_id: 2, name: 'Chicken Creamy Mushroom', description: 'chicken, mushrooms, creamy sauce, mashed potato', image: ''},
+    { id: 23, category_id: 2, name: 'Fish & Chips', description: 'Homemade battered fish, fries, Tartar sauce', image: ''},
+    { id: 24, category_id: 2, name: 'Crispy Skin Salmon', description: 'crispy salmon, sweet potato wedges, vegetable', image:''},
+    { id: 25, category_id: 2, name: 'Creamy Garlic Prawn', description: 'prawns, creamy garlic sauce, steamed rice', image: ''},
+    { id: 26, category_id: 2, name: 'Beef Stroganoff', description: 'sliced beef, creamy mushroom sauce, steamed rice', image: ''},
+    { id: 27, category_id: 2, name: 'Mongolian Beef', description: 'classic beef, onions, spring onion, fried rice', image: ''},
+    { id: 28, category_id: 2, name: 'Chilli Con Carne', description: 'slow cooked minced beef, stewed beans, tomato sauce', image:''},
+    // pizza & pasta
+    { id: 29, category_id: 4, name: 'Aglio Olio with Prawn/Chicken Grill', description: 'pasta, grilled prawn, grilled chicken, olive oil, chilli flakes, cherry tomato, parmesan, parsley', image: ''},
+    { id: 30, category_id: 4, name: 'Carbonara', description: 'pasta, bacon, mushroom, creamy sauce, parmesan', image: ''},
+    { id: 31, category_id: 4, name: 'Bolognese', description: 'pasta, minced beef, bolognese sauce, parmesan', image: ''},
+    { id: 32, category_id: 4, name: 'Seafood Spaghetti', description: 'spaghetti, prawns, calamari, paprika, parmesan', image: ''},
+    { id: 33, category_id: 4, name: 'Meat Lover Pizza', description: 'ham, salami, chicken, sausage, tomato sauce, cheddar, mozzarella', image: ''},
+    { id: 34, category_id: 4, name: 'Hawaiian Pizza', description: 'ham, pineapple, tomato sauce, cheddar, mozzarella', image: ''},
+    { id: 35, category_id: 4, name: 'Margareta Pizza', description: 'tomato sauce, Mozzarella, cheddar, Basil', image: ''},
+    { id: 36, category_id: 4, name: 'Seafood Pizza', description: 'calamari, prawns, onion, garlic, paprika, tomato sauce', image: ''},
+    { id: 37, category_id: 4, name: 'PIZZA GARLIC CHEESE', description: 'tortilla base, mozzarella chesse, garlic, cheddar, mozzarella', image: ''},
+    { id: 38, category_id: 4, name: 'GARLIC BREAD', description: 'toasted baguetta, garlic butter, parsley', image: ''},
+    { id: 39, category_id: 4, name: 'BRUSHETTA', description: 'toasted bread, tomato, olivr oil, basil', image: ''},
+    { id: 40, category_id: 4, name: 'MAC & CHEESE', description: 'macaroni, cheddar cheese, creamy cheese sauce', image: ''},
+    { id: 41, category_id: 4, name: 'MOZZARELLA STICKS', description: 'fried mozzarella sticks, marinara sauce', image: ''},
+    // Mocktails & Fresh Juices
+    { id: 42, category_id: 10, name: 'SHIRLEY TEMPLE', description: 'lemonade, lime juice, grenadine', image: ''},
+    { id: 43, category_id: 10, name: 'VIRGIN MOJITO', description: 'fresh mint, lime juice, soda water, sugar syrup', image: ''},
+    { id: 44, category_id: 10, name: 'PINA COLADA', description: 'pinapple jiuce, coconut cream, ice', image: ''},
+    { id: 45, category_id: 10, name: 'FRESH ORANGE JUICE', description: 'fresh orange juice', image: '' },
+    { id: 46, category_id: 10, name: 'FRESH MANGO JUICE', description: 'fresh mango juice', image: ''}
   ],
 };
