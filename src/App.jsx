@@ -1,0 +1,382 @@
+import React, { useState, useEffect } from 'react';
+import { MapPin, Phone, Mail, Clock, ChevronDown } from 'lucide-react';
+
+const rupiah = (n) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+
+// Resolves an image field to a real URL:
+// - already-absolute paths (dev demo images like "/images/hero.jpg", or full URLs) are used as-is
+// - plain filenames (as stored by the admin uploader, e.g. "abc123.jpg") get prefixed with /uploads/
+function imgSrc(path) {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path) || path.startsWith('/')) return path;
+  return '/uploads/' + path;
+}
+
+function emojiFor(name) {
+  const s = (name || '').toLowerCase();
+  if (/nigiri|sushi|uni /.test(s)) return '🍣';
+  if (/sashimi|salmon|tuna|fish/.test(s)) return '🐟';
+  if (/ramen|udon|noodle/.test(s)) return '🍜';
+  if (/burger/.test(s)) return '🍔';
+  if (/pizza/.test(s)) return '🍕';
+  if (/pasta|spaghetti|carbonara|bulgogi/.test(s)) return '🍝';
+  if (/coffee|espresso|latte|cappuccino|mocha|macchiato/.test(s)) return '☕';
+  if (/cocktail|mojito|margarita|colada|beer|wine|cider/.test(s)) return '🍹';
+  if (/salad|gado/.test(s)) return '🥗';
+  if (/soup|soto|tom yum/.test(s)) return '🍲';
+  if (/pancake|toast|egg|brekky|breakfast/.test(s)) return '🍳';
+  if (/cake|dessert|sweet/.test(s)) return '🍰';
+  if (/don|rice|curry|katsu|nasi/.test(s)) return '🍚';
+  if (/gyoza|dumpling/.test(s)) return '🥟';
+  if (/tea|matcha/.test(s)) return '🍵';
+  if (/mochi|ice cream/.test(s)) return '🍡';
+  if (/edamame|tofu/.test(s)) return '🫛';
+  if (/sandwich|wrap|club/.test(s)) return '🥪';
+  return '🍽️';
+}
+
+function useReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.14 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+}
+
+export default function App({ data }) {
+  const content = data?.content || {};
+  const categories = data?.categories || [];
+  const items = data?.items || [];
+
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeCat, setActiveCat] = useState(categories[0]?.id ?? null);
+
+  useReveal();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (content.brand) document.title = `${content.brand} — Restaurant & Bar in Kuta, Bali`;
+  }, [content.brand]);
+
+  const wa = `https://wa.me/${content.whatsapp || ''}`;
+  const featured = items.filter((i) => i.featured).slice(0, 3);
+  const withImages = items.filter((i) => i.image);
+  const shown = items.filter((i) => String(i.category_id) === String(activeCat));
+  const galleryImgs = withImages.slice(0, 4);
+  const galFallback = ['🍔', '🍹', '☕', '🪑'];
+  const heroImg = content.heroImage;
+  const links = [
+    ['Home', '#top'],
+    ['Our Story', '#about'],
+    ['Menu', '#menu'],
+    ['Gallery', '#gallery'],
+    ['Visit', '#visit'],
+  ];
+
+  return (
+    <div className="min-h-screen bg-ink text-paper">
+      {/* NAV */}
+      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-ink/95 backdrop-blur shadow-lg py-3' : 'bg-gradient-to-b from-black/50 to-transparent py-6'}`}>
+        <div className="uc-wrap flex items-center justify-between">
+          <a href="#top" className="font-serif text-xl font-semibold flex items-center gap-2 text-paper">
+            <span className="w-2 h-2 rounded-full bg-gold inline-block" />
+            {content.brand}
+          </a>
+          <div className="hidden md:flex items-center gap-8">
+            {links.map(([l, h]) => (
+              <a key={h} href={h} className="text-sm font-medium text-paper/75 hover:text-gold transition-colors">{l}</a>
+            ))}
+            <a href={wa} className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-xs font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">Reserve</a>
+          </div>
+          <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="md:hidden p-2 text-paper">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
+          </button>
+        </div>
+      </nav>
+
+      {/* MOBILE MENU */}
+      <div className={`fixed inset-0 z-[60] bg-ink text-paper flex flex-col items-center justify-center gap-8 transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <button aria-label="Close" onClick={() => setMobileOpen(false)} className="absolute top-6 right-6 text-3xl">×</button>
+        {links.map(([l, h]) => (
+          <a key={h} href={h} onClick={() => setMobileOpen(false)} className="text-2xl font-serif">{l}</a>
+        ))}
+        <a href={wa} onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold bg-gold text-ink mt-4">Reserve →</a>
+      </div>
+
+      <span id="top" />
+
+      {/* HERO — full-bleed */}
+      <header className="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
+        {heroImg ? (
+          <img
+            src={imgSrc(heroImg)}
+            alt={content.brand}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1c2f22] via-ink to-[#0e1712]" />
+        )}
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 opacity-[0.06]"
+          style={{ backgroundImage: 'radial-gradient(circle, rgba(244,238,223,.6) 1px, transparent 1px)', backgroundSize: '26px 26px' }} />
+
+        <div className="relative uc-wrap max-w-2xl mx-auto pt-24">
+          <div className="eyebrow justify-center flex mb-5">{content.heroEyebrow}</div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.1] mb-6">
+            Welcome to <span className="text-gold">{content.brand}</span>
+          </h1>
+          <p className="text-paper/75 leading-relaxed mb-9 max-w-xl mx-auto">{content.heroLede}</p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <a href="#menu" className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">Explore Menu</a>
+            <a href={wa} className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold border border-paper/40 text-paper hover:bg-paper hover:text-ink transition-colors">Reserve via WhatsApp</a>
+          </div>
+        </div>
+        <a href="#about" aria-label="Scroll" className="absolute bottom-8 left-1/2 -translate-x-1/2 text-paper/60 animate-bounce">
+          <ChevronDown size={26} />
+        </a>
+      </header>
+
+      {/* ABOUT / OUR STORY */}
+      <section className="py-24 md:py-32" id="about">
+        <div className="uc-wrap grid md:grid-cols-2 gap-16 items-center">
+          <div className="reveal">
+            <div className="eyebrow mb-3">{content.aboutEyebrow}</div>
+            <h2 className="text-3xl md:text-4xl font-semibold mb-6">
+              Our <span className="text-gold">Story</span>
+            </h2>
+            <p className="text-paper/65 leading-relaxed mb-8 whitespace-pre-line">{content.aboutText}</p>
+            <div className="grid grid-cols-3 gap-6 border-t border-paper/10 pt-6">
+              <div><div className="font-serif text-2xl font-semibold text-gold">2016</div><div className="text-xs text-paper/55 mt-1">Founded</div></div>
+              <div><div className="font-serif text-2xl font-semibold text-gold">Kuta</div><div className="text-xs text-paper/55 mt-1">Neighborhood spot</div></div>
+              <div><div className="font-serif text-2xl font-semibold text-gold">Daily</div><div className="text-xs text-paper/55 mt-1">Fresh, made to order</div></div>
+            </div>
+          </div>
+          <div className="reveal relative">
+            {(withImages[1]?.image || withImages[0]?.image) ? (
+              <div className="aspect-[4/5] rounded-[1.5rem] overflow-hidden">
+                <img
+                  src={imgSrc(withImages[1]?.image || withImages[0]?.image)}
+                  alt={`About ${content.brand}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="aspect-[4/5] rounded-[1.5rem] bg-gradient-to-br from-sage/25 to-black/40 flex items-center justify-center text-8xl">🐟</div>
+            )}
+            <div className="absolute -bottom-6 -right-4 sm:right-6 bg-ink border border-paper/15 rounded-xl px-5 py-3.5 shadow-xl">
+              <div className="font-serif font-semibold text-sm">Open Every Day</div>
+              <div className="text-xs text-paper/55">{content.hours?.[0]?.h || '11:00 AM – 10:00 PM'}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MENU */}
+      <section className="py-24 md:py-32 bg-black/25" id="menu">
+        <div className="uc-wrap">
+          <div className="reveal text-center max-w-xl mx-auto mb-4">
+            <div className="eyebrow justify-center flex mb-3">Today's Menu</div>
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              Our <span className="text-gold">Menu</span>
+            </h2>
+          </div>
+          <p className="reveal text-center text-paper/55 text-sm max-w-lg mx-auto mb-10">
+            Breakfast, mains, burgers, pizza and cocktails made with international flavors and local produce, served all day.
+          </p>
+          <div className="reveal flex flex-wrap justify-center gap-3 mb-12">
+            {categories.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setActiveCat(c.id)}
+                className={`px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${String(activeCat) === String(c.id) ? 'bg-gold text-ink border-gold' : 'border-paper/20 text-paper/70 hover:border-paper/40'}`}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {shown.length === 0 && <p className="text-paper/45 text-center py-8 col-span-full">No items in this category yet.</p>}
+            {shown.map((it) => (
+              <div className="reveal rounded-2xl overflow-hidden bg-paper/[0.04] border border-paper/10 hover:border-gold/40 transition-colors" key={it.id}>
+                {it.image
+                  ? <div className="aspect-[4/3] overflow-hidden">
+                    <img
+                      src={imgSrc(it.image)}
+                      alt={it.name}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  : <div className="aspect-[4/3] bg-gradient-to-br from-sage/20 to-black/30 flex items-center justify-center text-5xl">{emojiFor(it.name)}</div>}
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-3 mb-1.5">
+                    <h3 className="font-serif font-semibold flex items-center gap-2 flex-wrap">
+                      {it.name}
+                      {it.tag && <span className="text-[10px] uppercase tracking-wide bg-gold/15 text-gold px-2 py-0.5 rounded-full font-sans font-semibold">{it.tag}</span>}
+                    </h3>
+                  </div>
+                  {it.description && <p className="text-sm text-paper/55 leading-relaxed">{it.description}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURED
+      {featured.length > 0 && (
+        <section className="py-24 md:py-32">
+          <div className="uc-wrap">
+            <div className="reveal text-center max-w-xl mx-auto mb-12">
+              <div className="eyebrow justify-center flex mb-3">Guest Favorites</div>
+              <h2 className="text-3xl md:text-4xl font-semibold">Always <span className="text-gold">Ordered</span></h2>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featured.map((it) => (
+                <div className="reveal rounded-2xl overflow-hidden bg-paper/[0.04] border border-paper/10" key={it.id}>
+                  {it.image
+                    ? <div className="aspect-[4/3] overflow-hidden"><img
+                      className="w-full h-full object-cover"
+                      src={imgSrc(it.image)}
+                      alt={it.name}
+                      loading="lazy"
+                    /></div>
+                    : <div className="aspect-[4/3] bg-gradient-to-br from-sage/20 to-black/30 flex items-center justify-center text-5xl">{emojiFor(it.name)}</div>}
+                  <div className="p-6">
+                    <h3 className="font-serif text-lg font-semibold mb-1.5">{it.name}</h3>
+                    <p className="text-sm text-paper/55 mb-4 leading-relaxed">{it.description}</p>
+                    <div className="font-serif font-semibold text-gold">{rupiah(it.price)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )} */}
+
+      {/* GALLERY */}
+      <section className="py-24 md:py-32 bg-black/25" id="gallery">
+        <div className="uc-wrap">
+          <div className="reveal text-center max-w-xl mx-auto mb-12">
+            <div className="eyebrow justify-center flex mb-3">Ambience</div>
+            <h2 className="text-3xl md:text-4xl font-semibold">Around <span className="text-gold">{content.brand}</span></h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {(galleryImgs.length ? galleryImgs : galFallback).map((g, i) => {
+              const isImg = typeof g === 'object';
+              return (
+                <div
+                  key={i}
+                  className="reveal aspect-square rounded-2xl flex items-center justify-center text-4xl overflow-hidden bg-gradient-to-br from-sage/20 to-black/30"
+                >
+                  {isImg ? <img className="w-full h-full object-cover" src={imgSrc(g.image)} alt={g.name} loading="lazy" /> : g}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* VISIT / GET IN TOUCH */}
+      <section className="py-24 md:py-32" id="visit">
+        <div className="uc-wrap">
+          <div className="reveal text-center max-w-xl mx-auto mb-14">
+            <div className="eyebrow justify-center flex mb-3">Come Say Hi</div>
+            <h2 className="text-3xl md:text-4xl font-semibold">Visit <span className="text-gold">Us</span></h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-10 items-start">
+            <div className="reveal space-y-6">
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold"><MapPin size={19} /></div>
+                <div>
+                  <div className="font-serif font-semibold mb-1">Location</div>
+                  <div className="text-sm text-paper/60">{content.address}</div>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold"><Phone size={19} /></div>
+                <div>
+                  <div className="font-serif font-semibold mb-1">Phone</div>
+                  <div className="text-sm text-paper/60">{content.phone}</div>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold"><Mail size={19} /></div>
+                <div>
+                  <div className="font-serif font-semibold mb-1">Email</div>
+                  <div className="text-sm text-paper/60">{content.email}</div>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold"><Clock size={19} /></div>
+                <div>
+                  <div className="font-serif font-semibold mb-1">Opening Hours</div>
+                  {(content.hours || []).map((h, i) => (
+                    <div className="text-sm text-paper/60" key={i}>{h.d}: <span className="text-paper/80">{h.h}</span></div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-3 pt-3">
+                <a href={wa} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">WhatsApp</a>
+                <a href={`https://instagram.com/${content.instagram || ''}`} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold border border-paper/25 text-paper hover:border-paper/50 transition-colors">@{content.instagram}</a>
+              </div>
+            </div>
+            <div className="reveal rounded-2xl overflow-hidden bg-black/40 border border-paper/10 min-h-[420px] relative">
+              <iframe
+                title="Location"
+                className="absolute inset-0 w-full h-full border-0"
+                src={`https://www.google.com/maps?q=${encodeURIComponent(content.address || content.mapsQuery || 'Kuta, Bali')}&output=embed`}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-black/40 border-t border-paper/10 pt-20 pb-8">
+        <div className="uc-wrap">
+          <div className="grid md:grid-cols-3 gap-10 mb-14">
+            <div>
+              <div className="font-serif text-xl font-semibold flex items-center gap-2 mb-3">
+                <span className="w-2 h-2 rounded-full bg-gold inline-block" />{content.brand}
+              </div>
+              <p className="text-paper/55 text-sm max-w-xs leading-relaxed">{content.heroLede}</p>
+            </div>
+            <div>
+              <h4 className="text-xs uppercase tracking-wide text-gold font-semibold mb-4">Explore</h4>
+              <div className="flex flex-col gap-2">
+                {links.map(([l, h]) => <a key={h} href={h} className="text-paper/65 text-sm hover:text-gold">{l}</a>)}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-xs uppercase tracking-wide text-gold font-semibold mb-4">Connect</h4>
+              <div className="flex flex-col gap-2">
+                <a href={wa} className="text-paper/65 text-sm hover:text-gold">WhatsApp</a>
+                <a href={`https://instagram.com/${content.instagram || ''}`} className="text-paper/65 text-sm hover:text-gold">Instagram</a>
+                <a href={`mailto:${content.email || ''}`} className="text-paper/65 text-sm hover:text-gold">Email</a>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-paper/10 pt-6 flex flex-wrap justify-between gap-3 text-xs text-paper/45">
+            <span>© {new Date().getFullYear()} {content.brand} · Kuta, Bali</span>
+            <a href="/admin/" className="hover:text-gold">Admin Login →</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
