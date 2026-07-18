@@ -68,7 +68,7 @@ export const DEV_DATA = {
     // pizza & pasta
     { id: 29, category_id: 4, name: 'Aglio Olio with Prawn/Chicken Grill', description: 'pasta, grilled prawn, grilled chicken, olive oil, chilli flakes, cherry tomato, parmesan, parsley', image: '' },
     { id: 30, category_id: 4, name: 'Carbonara', description: 'pasta, bacon, mushroom, creamy sauce, parmesan', image: '' },
-    { id: 31, category_id: 4, name: 'Bolognese', description: 'pasta, minced beef, bolognese sauce, parmesan', image: '' },
+    { id: 31, category_id: 4, name: 'Bolognese', description: 'pasta, minced beef, bolognese sauce, parmesan', image: '/images/bolognese.jpeg' },
     { id: 32, category_id: 4, name: 'Seafood Spaghetti', description: 'spaghetti, prawns, calamari, paprika, parmesan', image: '' },
     { id: 33, category_id: 4, name: 'Meat Lover Pizza', description: 'ham, salami, chicken, sausage, tomato sauce, cheddar, mozzarella', image: '' },
     { id: 34, category_id: 4, name: 'Hawaiian Pizza', description: 'ham, pineapple, tomato sauce, cheddar, mozzarella', image: '' },
@@ -189,4 +189,6 @@ export const DEV_DATA = {
     { id: 9, image: '/images/IMG_6712.jpg'}
   ],
 
+  katalog: [
+  ],
 };

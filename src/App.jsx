@@ -5,8 +5,6 @@ import { MapPin, Phone, Mail, Clock, ChevronDown } from 'lucide-react';
 const rupiah = (n) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
 
 // Nyalakan mode maintenance dengan set ke true.
-// Selama true, seluruh isi situs disembunyikan dan hanya halaman
-// "sedang dalam perbaikan" di bawah ini yang ditampilkan.
 const MAINTENANCE_MODE = false;
 
 function Maintenance({ content, wa }) {
@@ -37,11 +35,8 @@ function Maintenance({ content, wa }) {
   );
 }
 
-// Resolves an image field to a real URL:
-// - already-absolute paths (dev demo images like "/images/hero.jpg", or full URLs) are used as-is
-// - plain filenames (as stored by the admin uploader, e.g. "abc123.jpg") get prefixed with /uploads/
 function imgSrc(path) {
-  if (!path) return null;
+  if (!path) return '';
   if (/^https?:\/\//i.test(path) || path.startsWith('/')) return path;
   return '/uploads/' + path;
 }
@@ -83,13 +78,26 @@ function useReveal() {
   }, []);
 }
 
+// PERBAIKAN: Fungsi helper untuk menangani navigasi smooth scroll pada HashRouter
+function handleHashScroll(e, to) {
+  if (to.startsWith('#')) {
+    e.preventDefault();
+    const element = document.querySelector(to);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      window.history.pushState(null, null, `/${to}`);
+    }
+  }
+}
+
 function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink = true }) {
+  // PERBAIKAN: Mengubah target route internal menjadi element selector ID halaman utama yang ada
   const primaryLinks = [
-    { label: 'Home', to: '/' },
-    { label: 'Our Story', to: '/about' },
+    { label: 'Home', to: '#top' },
+    { label: 'Our Story', to: '#about' },
     { label: 'Menu', to: '/menu' },
-    { label: 'Gallery', to: '/gallery' },
-    { label: 'Visit', to: '/visit' },
+    { label: 'Gallery', to: '#gallery' },
+    { label: 'Visit', to: '#visit' }, // Disesuaikan ke ID seksi katalog/footer terdekat
   ];
 
   return (
@@ -102,7 +110,13 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
           </Link>
           <div className="hidden md:flex items-center gap-8">
             {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
-              <Link key={link.to} to={link.to} className="text-sm font-medium text-paper/75 hover:text-gold transition-colors">{link.label}</Link>
+              link.to.startsWith('#') ? (
+                <a key={link.to} href={link.to} onClick={(e) => handleHashScroll(e, link.to)} className="text-sm font-medium text-paper/75 hover:text-gold transition-colors">
+                  {link.label}
+                </a>
+              ) : (
+                <Link key={link.to} to={link.to} className="text-sm font-medium text-paper/75 hover:text-gold transition-colors">{link.label}</Link>
+              )
             ))}
             <a href={wa} className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-xs font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">Reserve</a>
           </div>
@@ -115,7 +129,13 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
       <div className={`fixed inset-0 z-[60] bg-ink text-paper flex flex-col items-center justify-center gap-8 transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <button aria-label="Close" onClick={() => setMobileOpen(false)} className="absolute top-6 right-6 text-3xl">×</button>
         {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
-          <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-2xl font-serif">{link.label}</Link>
+          link.to.startsWith('#') ? (
+            <a key={link.to} href={link.to} onClick={(e) => { setMobileOpen(false); handleHashScroll(e, link.to); }} className="text-2xl font-serif">
+              {link.label}
+            </a>
+          ) : (
+            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-2xl font-serif">{link.label}</Link>
+          )
         ))}
         <a href={wa} onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold bg-gold text-ink mt-4">Reserve →</a>
       </div>
@@ -139,7 +159,8 @@ function PageFooter({ content, wa }) {
             <div className="flex flex-col gap-2">
               <Link to="/" className="text-paper/65 text-sm hover:text-gold">Home</Link>
               <Link to="/menu" className="text-paper/65 text-sm hover:text-gold">Menu</Link>
-              <a href="/#visit" className="text-paper/65 text-sm hover:text-gold">Visit</a>
+              {/* PERBAIKAN: Menggunakan anchor tag hash dengan handler scroll */}
+              <a href="#katalog" onClick={(e) => handleHashScroll(e, '#katalog')} className="text-paper/65 text-sm hover:text-gold">Visit</a>
             </div>
           </div>
           <div>
@@ -160,8 +181,11 @@ function PageFooter({ content, wa }) {
   );
 }
 
-function HomePage({ content, items, data, wa, scrolled, mobileOpen, setMobileOpen }) {
+function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, setMobileOpen }) {
   useReveal();
+
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+
   const featured = items.filter((i) => i.featured).slice(0, 3);
   const galleryImgs = data.gallery || [];
   const heroImg = content.heroImage;
@@ -191,7 +215,8 @@ function HomePage({ content, items, data, wa, scrolled, mobileOpen, setMobileOpe
             <a href={wa} className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold border border-paper/40 text-paper hover:bg-paper hover:text-ink transition-colors">Reserve via WhatsApp</a>
           </div>
         </div>
-        <a href="#about" aria-label="Scroll" className="absolute bottom-8 left-1/2 -translate-x-1/2 text-paper/60 animate-bounce">
+        {/* PERBAIKAN: Menggunakan onClick handler agar bounce anchor bekerja */}
+        <a href="#about" onClick={(e) => handleHashScroll(e, '#about')} aria-label="Scroll" className="absolute bottom-8 left-1/2 -translate-x-1/2 text-paper/60 animate-bounce">
           <ChevronDown size={26} />
         </a>
       </header>
@@ -244,61 +269,197 @@ function HomePage({ content, items, data, wa, scrolled, mobileOpen, setMobileOpe
 
       <div className="wave-divider bg-black/25" />
 
-      {/* <section className="py-24 md:py-32 bg-black/25" id="menu">
-        <div className="uc-wrap">
+      <section className="py-24 md:py-32 bg-black/40 overflow-hidden" id="katalog">
+        <div className="uc-wrap max-w-6xl mx-auto px-4">
           <div className="reveal text-center max-w-xl mx-auto mb-4">
-            <div className="eyebrow justify-center flex mb-3">Today's Menu</div>
-            <h2 className="text-3xl md:text-4xl font-semibold">
-              Our <span className="text-gold">Menu</span>
+            <div className="eyebrow justify-center flex mb-3 text-gold">Our Highlights</div>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white">
+              Explore Our <span className="text-gold">Catalog</span>
             </h2>
           </div>
-          <p className="reveal text-center text-paper/55 text-sm max-w-lg mx-auto mb-10">
-            A short taste of what awaits — browse the full menu page for all categories.
+          <p className="reveal text-center text-paper/55 text-sm max-w-lg mx-auto mb-12">
+            Browse through our exclusive experiences, spatial atmospheres, and signature culinary highlights.
           </p>
-          <div className="reveal grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featured.map((it) => (
-              <div className="rounded-lg overflow-hidden bg-paper/[0.04] border border-paper/10 hover:border-gold/50 transition-colors" key={it.id}>
-                {it.image ? (
-                  <div className="aspect-[4/3] overflow-hidden frame-corners">
-                    <img src={imgSrc(it.image)} alt={it.name} loading="lazy" className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="aspect-[4/3] bg-gradient-to-br from-sage/20 to-black/30 flex items-center justify-center text-5xl">{emojiFor(it.name)}</div>
-                )}
-                <div className="p-5">
-                  <h3 className="font-serif font-semibold mb-1.5">{it.name}</h3>
-                  {it.description && <p className="text-sm text-paper/55 leading-relaxed">{it.description}</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="reveal flex justify-center mt-12">
-            <Link to="/menu" className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">
-              Lihat Menu Lengkap
-              <ChevronDown size={16} />
-            </Link>
-          </div>
-        </div>
-      </section> */}
 
-      <section className="py-24 md:py-32 bg-black/25" id="gallery">
-        <div className="uc-wrap">
-          <div className="reveal text-center max-w-xl mx-auto mb-12">
-            <div className="eyebrow justify-center flex mb-3">Ambience</div>
-            <h2 className="text-3xl md:text-4xl font-semibold">Around <span className="text-gold">{content.brand}</span></h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {galleryImgs.map((photo) => (
-              <div key={photo.id} className="aspect-square rounded-lg overflow-hidden reveal frame-corners">
-                <img src={photo.image} className="w-full h-full object-cover hover:scale-110 transition duration-500" loading="lazy" />
+          {(() => {
+            const [activeIndex, setActiveIndex] = useState(0);
+            const dataKatalog = Array.isArray(katalog) ? katalog : [];
+
+            const handlePrev = () => {
+              setActiveIndex((prev) => (prev === 0 ? dataKatalog.length - 1 : prev - 1));
+            };
+
+            const handleNext = () => {
+              setActiveIndex((prev) => (prev === dataKatalog.length - 1 ? 0 : prev + 1));
+            };
+
+            if (dataKatalog.length === 0) {
+              return <p className="text-center text-paper/45">Belum ada katalog tersedia.</p>;
+            }
+
+            return (
+              <div className="relative flex items-center justify-center h-[430px] md:h-[500px] w-full max-w-4xl mx-auto px-12">
+                <button
+                  onClick={handlePrev}
+                  type="button"
+                  className="absolute left-0 z-30 p-2.5 rounded-full bg-paper/90 hover:bg-paper text-ink shadow-lg transition-all focus:outline-none"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                </button>
+
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {dataKatalog.map((it, index) => {
+                    let position = index - activeIndex;
+                    if (position < -1) position = position + dataKatalog.length;
+                    if (position > 1) position = position - dataKatalog.length;
+
+                    const isActive = position === 0;
+                    const isLeft = position === -1;
+                    const isRight = position === 1;
+
+                    if (!isActive && !isLeft && !isRight) return null;
+
+                    return (
+                      <div
+                        key={it.id || index}
+                        className={`absolute w-[280px] md:w-[350px] h-[380px] md:h-[460px] rounded-xl overflow-hidden bg-paper/[0.04] border transition-all duration-500 ease-out flex flex-col ${isActive
+                          ? 'z-20 scale-100 opacity-100 border-gold/50 shadow-2xl translate-x-0'
+                          : isLeft
+                            ? 'z-10 scale-85 opacity-30 border-paper/10 -translate-x-[45%] md:-translate-x-[55%]'
+                            : 'z-10 scale-85 opacity-30 border-paper/10 translate-x-[45%] md:translate-x-[55%]'
+                          }`}
+                        style={{ backdropFilter: isActive ? 'none' : 'blur(3px)' }}
+                      >
+                        <div className="relative w-full h-[65%] overflow-hidden frame-corners bg-zinc-900">
+                          <img
+                            src={imgSrc(it.image)}
+                            alt={it.name || 'Catalog Image'}
+                            loading="lazy"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="p-5 flex-1 bg-black/40 border-t border-paper/5 flex flex-col justify-between">
+                          <div>
+                            <h3 className="font-serif font-semibold text-base md:text-lg mb-1 text-gold">
+                              {it.name || 'Untitled'}
+                            </h3>
+                            {it.description && (
+                              <p className="text-xs md:text-sm text-paper/55 line-clamp-3 leading-relaxed">
+                                {it.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={handleNext}
+                  type="button"
+                  className="absolute right-0 z-30 p-2.5 rounded-full bg-paper/90 hover:bg-paper text-ink shadow-lg transition-all focus:outline-none"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </button>
               </div>
-            ))}
-          </div>
+            );
+          })()}
         </div>
       </section>
 
-      <div className="wave-divider bg-ink" />
+      <div className="wave-divider bg-black/25" />
 
+      <section className="py-24 md:py-32 bg-black/25 overflow-hidden" id="gallery">
+        <div className="uc-wrap max-w-6xl mx-auto px-4">
+          <div className="reveal text-center max-w-xl mx-auto mb-12">
+            <div className="eyebrow justify-center flex mb-3">Ambience</div>
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              Around <span className="text-gold">{content.brand}</span>
+            </h2>
+          </div>
+
+          {(() => {
+            const [activeIndex, setActiveIndex] = useState(0);
+            const dataGallery = Array.isArray(galleryImgs) ? galleryImgs : [];
+
+            const handlePrev = () => {
+              setActiveIndex((prev) => (prev === 0 ? dataGallery.length - 1 : prev - 1));
+            };
+
+            const handleNext = () => {
+              setActiveIndex((prev) => (prev === dataGallery.length - 1 ? 0 : prev + 1));
+            };
+
+            if (dataGallery.length === 0) {
+              return <p className="text-center text-paper/45">Belum ada foto gallery tersedia.</p>;
+            }
+
+            return (
+              <div className="relative flex items-center justify-center h-[340px] md:h-[420px] w-full max-w-4xl mx-auto px-12">
+                <button
+                  onClick={handlePrev}
+                  type="button"
+                  className="absolute left-0 z-30 p-2.5 rounded-full bg-paper/90 hover:bg-paper text-ink shadow-lg transition-all focus:outline-none"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M15 18l-6-6 6-6" />
+                  </svg>
+                </button>
+
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {dataGallery.map((photo, index) => {
+                    let position = index - activeIndex;
+                    if (position < -1) position = position + dataGallery.length;
+                    if (position > 1) position = position - dataGallery.length;
+
+                    const isActive = position === 0;
+                    const isLeft = position === -1;
+                    const isRight = position === 1;
+
+                    if (!isActive && !isLeft && !isRight) return null;
+
+                    return (
+                      <div
+                        key={photo.id || index}
+                        className={`absolute w-[260px] md:w-[350px] aspect-square rounded-xl overflow-hidden border transition-all duration-500 ease-out frame-corners ${isActive
+                          ? 'z-20 scale-100 opacity-100 border-gold/50 shadow-2xl translate-x-0'
+                          : isLeft
+                            ? 'z-10 scale-85 opacity-30 border-paper/10 -translate-x-[45%] md:-translate-x-[55%]'
+                            : 'z-10 scale-85 opacity-30 border-paper/10 translate-x-[45%] md:translate-x-[55%]'
+                          }`}
+                        style={{ backdropFilter: isActive ? 'none' : 'blur(3px)' }}
+                      >
+                        <img
+                          src={photo.image}
+                          alt="Ambience"
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={handleNext}
+                  type="button"
+                  className="absolute right-0 z-30 p-2.5 rounded-full bg-paper/90 hover:bg-paper text-ink shadow-lg transition-all focus:outline-none"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </button>
+              </div>
+            );
+          })()}
+        </div>
+      </section>
+      <div className="wave-divider bg-black/25" />
       <section className="py-24 md:py-32" id="visit">
         <div className="uc-wrap">
           <div className="reveal text-center max-w-xl mx-auto mb-14">
@@ -356,6 +517,7 @@ function HomePage({ content, items, data, wa, scrolled, mobileOpen, setMobileOpe
           </div>
         </div>
       </section>
+
 
       <div className="wave-divider bg-black/40" />
       <PageFooter content={content} wa={wa} />
@@ -436,6 +598,8 @@ function MenuPage({ content, categories, items, wa, scrolled, mobileOpen, setMob
         </div>
       </section>
 
+
+
       {posterLightbox && (
         <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 md:p-10" onClick={() => setPosterLightbox(null)}>
           <button onClick={() => setPosterLightbox(null)} aria-label="Tutup" className="absolute top-5 right-5 md:top-8 md:right-8 text-paper/80 hover:text-gold transition-colors">
@@ -454,6 +618,7 @@ export default function App({ data }) {
   const content = data?.content || {};
   const categories = data?.categories || [];
   const items = data?.items || [];
+  const katalog = data?.katalog || [];
 
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -478,7 +643,7 @@ export default function App({ data }) {
     <HashRouter>
       <Routes>
         <Route path="/menu" element={<MenuPage content={content} categories={categories} items={items} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
-        <Route path="*" element={<HomePage content={content} items={items} data={data} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
+        <Route path="*" element={<HomePage content={content} items={items} katalog={katalog} data={data} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
       </Routes>
     </HashRouter>
   );
