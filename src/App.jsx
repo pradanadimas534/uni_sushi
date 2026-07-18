@@ -14,7 +14,7 @@ function Maintenance({ content, wa }) {
     <div className="min-h-screen bg-ink text-paper flex items-center justify-center px-6 relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.06] bg-seigaiha" style={{ backgroundSize: '56px 28px' }} />
       <div className="relative text-center max-w-lg">
-        <img src="/images/logo.jpeg" alt={content.brand || 'Uni Sushi'} className="w-20 h-20 rounded-full mx-auto mb-8 object-cover ring-1 ring-gold/40" />
+        <img src="/public/images/logo.jpeg" alt={content.brand || 'Uni Sushi'} className="w-20 h-20 rounded-full mx-auto mb-8 object-cover ring-1 ring-gold/40" />
         <div className="eyebrow justify-center flex mb-4">Sedang Dalam Perbaikan</div>
         <h1 className="text-3xl md:text-4xl font-semibold mb-5 leading-tight">
           {content.brand || 'Uni Sushi'} <span className="text-gold">sedang berbenah</span>
@@ -86,10 +86,10 @@ function useReveal() {
 function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink = true }) {
   const primaryLinks = [
     { label: 'Home', to: '/' },
-    { label: 'Our Story', to: '/#about' },
+    { label: 'Our Story', to: '/about' },
     { label: 'Menu', to: '/menu' },
-    { label: 'Gallery', to: '/#gallery' },
-    { label: 'Visit', to: '/#visit' },
+    { label: 'Gallery', to: '/gallery' },
+    { label: 'Visit', to: '/visit' },
   ];
 
   return (
@@ -97,7 +97,7 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-ink/95 backdrop-blur shadow-lg py-3' : 'bg-gradient-to-b from-black/50 to-transparent py-6'}`}>
         <div className="uc-wrap flex items-center justify-between">
           <Link to="/" className="font-serif text-xl font-semibold flex items-center gap-3 text-paper">
-            <img src="/images/logo.jpeg" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+            <img src="/public/images/logo.jpeg" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
             {content.brand}
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -130,7 +130,7 @@ function PageFooter({ content, wa }) {
         <div className="grid md:grid-cols-3 gap-10 mb-14">
           <div>
             <div className="font-serif text-xl font-semibold flex items-center gap-3 mb-3">
-              <img src="/images/logo.jpeg" alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />{content.brand}
+              <img src="/public/images/logo.jpeg" alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />{content.brand}
             </div>
             <p className="text-paper/55 text-sm max-w-xs leading-relaxed">{content.heroLede}</p>
           </div>
@@ -244,7 +244,7 @@ function HomePage({ content, items, data, wa, scrolled, mobileOpen, setMobileOpe
 
       <div className="wave-divider bg-black/25" />
 
-      <section className="py-24 md:py-32 bg-black/25" id="menu">
+      {/* <section className="py-24 md:py-32 bg-black/25" id="menu">
         <div className="uc-wrap">
           <div className="reveal text-center max-w-xl mx-auto mb-4">
             <div className="eyebrow justify-center flex mb-3">Today's Menu</div>
@@ -279,7 +279,7 @@ function HomePage({ content, items, data, wa, scrolled, mobileOpen, setMobileOpe
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <section className="py-24 md:py-32 bg-black/25" id="gallery">
         <div className="uc-wrap">
