@@ -25,7 +25,7 @@ export const DEV_DATA = {
     { id: 2, name: 'Asian All Dining & Main Course' },
     { id: 3, name: 'Burgers & Sandwiches & Hot Dogs' },
     { id: 4, name: 'Pizza & Pasta' },
-    { id: 5, name: 'Salads & Soups', posterImage: '/images/menu/soup.jpg' },
+    { id: 5, name: 'Salads & Soups'},
     { id: 6, name: 'Sides & Snacks' },
     { id: 7, name: 'Desserts & Cakes' },
     { id: 8, name: 'Coffee & Tea' },
