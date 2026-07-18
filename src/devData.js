@@ -12,12 +12,12 @@ export const DEV_DATA = {
     aboutText: "Founded in 2016, Uni blends international flavors with local produce — a place for sports, late nights and the best hangover cure in town.\n\nWe're more than just a restaurant. We're your neighborhood gathering spot where great food meets great company, and every game feels like a celebration.\n\nFrom our signature cocktails to comfort food classics, everything is crafted with passion and served with the warmth that makes Uni feel like home.",
     address: 'Jl. Benesari, Kuta, Kec. Kuta, Kabupaten Badung, Bali 80361, Indonesia',
     phone: '+62 895-4216-45000',
-    whatsapp: '6289542164500',
+    whatsapp: '62895421645000',
     email: 'contact@unicafebali.com',
     instagram: 'unicafebali',
     mapsQuery: 'https://maps.app.goo.gl/LE8RhSwv8ccwumtr9',
     hours: [
-      { d: 'Every day', h: 'Hours to be confirmed' },
+      { h: 'Open Close 12 am' },
     ],
   },
   categories: [
@@ -25,7 +25,7 @@ export const DEV_DATA = {
     { id: 2, name: 'Asian All Dining & Main Course' },
     { id: 3, name: 'Burgers & Sandwiches & Hot Dogs' },
     { id: 4, name: 'Pizza & Pasta' },
-    { id: 5, name: 'Salads & Soups' },
+    { id: 5, name: 'Salads & Soups', posterImage: '/images/menu/soup.jpg' },
     { id: 6, name: 'Sides & Snacks' },
     { id: 7, name: 'Desserts & Cakes' },
     { id: 8, name: 'Coffee & Tea' },
@@ -36,14 +36,14 @@ export const DEV_DATA = {
   ],
   items: [
     // Breakfast, Brunch & Lunch
-    { id: 1, category_id: 1, name: 'Full English Brekky', description: 'Eggs, bacon, sausage, hash brown, baked beans, grilled tomato, toast.', tag: '', featured: true, image: '' },
+    { id: 1, category_id: 1, name: 'Full English Brekky', description: 'Eggs, bacon, sausage, hash brown, baked beans, grilled tomato, toast.', tag: '', featured: true, image: '/images/DSC00054.jpg' },
     { id: 2, category_id: 1, name: 'Egg benny', description: 'Toasted Muffin, Poached Eggs, Baby Spinach, Hollandaise Sauce', tag: '', image: '' },
     { id: 3, category_id: 1, name: 'Big boy warp', description: 'Homemade Beef Patty, Bacon, Has Brown, Scrambled egg, cheese', image: '' },
     { id: 4, category_id: 1, name: 'Uni Brekky Burger', description: 'Homemade Beef Patty, Fried Egg, Hash Brown, Cheese, Burger Bun', image: '' },
     { id: 5, category_id: 1, name: 'Croissant Stacker', description: 'Croissant, Fried Egg, Ham, Cheese, Fresh Tomato, Basil, Avocado Smash', image: '' },
     { id: 6, category_id: 1, name: 'Croissant Tuna', description: 'croissant, Smashed Boiled Egg, Tuna Mayo', image: '' },
     // Asian All Dining & Main Course
-    { id: 7, category_id: 2, name: 'Nasi Goreng', description: 'fried rice, Vegetables, Prawn Cracker, Traditional Pickle, Chicken Satay', image: '' },
+    { id: 7, category_id: 2, name: 'Nasi Goreng', description: 'fried rice, Vegetables, Prawn Cracker, Traditional Pickle, Chicken Satay', image: '/images/DSC00107.jpg' },
     { id: 8, category_id: 2, name: 'Mie Goreng', description: 'fried noodle, vegetables, sunny side egg, prawn cracker, traditional pikles, chiken satay', image: '' },
     { id: 9, category_id: 2, name: 'Chicken Satay', description: 'grilled chicken skewers, peanut sauce, traditional pickles, steamed rice', image: '' },
     { id: 10, category_id: 2, name: 'Sweet & Sour Chicken', description: 'fried chiken, sweet & sour sauce, capsicum, pineaple, onion', image: '' },
@@ -82,9 +82,9 @@ export const DEV_DATA = {
     // Mocktails & Fresh Juices
     { id: 42, category_id: 10, name: 'SHIRLEY TEMPLE', description: 'lemonade, lime juice, grenadine', image: '' },
     { id: 43, category_id: 10, name: 'VIRGIN MOJITO', description: 'fresh mint, lime juice, soda water, sugar syrup', image: '' },
-    { id: 44, category_id: 10, name: 'PINA COLADA', description: 'pinapple jiuce, coconut cream, ice', image: '' },
+    { id: 44, category_id: 10, name: 'PINA COLADA', description: 'pinapple jiuce, coconut cream, ice', image: '/images/DSC00206.jpg' },
     { id: 45, category_id: 10, name: 'FRESH ORANGE JUICE', description: 'fresh orange juice', image: '' },
-    { id: 46, category_id: 10, name: 'FRESH MANGO JUICE', description: 'fresh mango juice', image: '' },
+    { id: 46, category_id: 10, name: 'FRESH MANGO JUICE', description: 'fresh mango juice', image: '/images/DSC00484.jpg' },
 
     //Burgers & Sandwiches & Hot Dogs
     { id: 47, category_id: 3, name: 'Triple Monkey', description: 'Beef Patty, Mushroom, Caramelized Onion, Fried Egg, Cheddar Cheese, Tomato, Lettuce, Ketchup, Mayo', image: '' },
@@ -177,4 +177,16 @@ export const DEV_DATA = {
     { id: 129, category_id: 12, name: 'TEQUILA SHOT', description: 'Tequila, Salt, Lime', image: '' }
 
   ],
+  gallery: [
+    { id: 1, image: '/images/IMG_3696.jpg',},
+    { id: 2, image: '/images/IMG_6304.jpg'},
+    { id: 3, image: '/images/IMG_6306.jpg'},
+    { id: 4, image: '/images/IMG_6328.jpg'},
+    { id: 5, image: '/images/IMG_6462.jpg'},
+    { id: 6, image: '/images/IMG_6539.jpg'},
+    { id: 7, image: '/images/IMG_6710.jpg'},
+    { id: 8, image: '/images/IMG_6711.jpg'},
+    { id: 9, image: '/images/IMG_6712.jpg'}
+  ],
+
 };

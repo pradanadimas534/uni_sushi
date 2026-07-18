@@ -12,13 +12,47 @@
 
 @layer components {
   .uc-wrap { @apply max-w-6xl mx-auto px-5 sm:px-8; }
-  .eyebrow { @apply text-xs tracking-[0.2em] uppercase text-coral font-semibold; }
+  .eyebrow { @apply text-xs tracking-[0.28em] uppercase text-coral font-semibold inline-flex items-center gap-2; }
+  .eyebrow::before { content: ''; @apply w-4 h-px bg-coral/70; }
   .btn { @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-colors; }
-  .btn-coral { @apply btn bg-coral text-paper hover:bg-[#c9532f]; }
+  .btn-coral { @apply btn bg-coral text-paper hover:bg-[#84291f]; }
   .btn-ghost { @apply btn border border-ink/20 text-ink hover:border-ink/50; }
   .btn-light { @apply btn bg-paper text-ink hover:bg-white; }
   .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
   .reveal.in { opacity: 1; transform: none; }
+
+  /* Hanko-style seal mark, used for the brand mark and small decorative stamps */
+  .hanko {
+    @apply relative inline-flex items-center justify-center flex-shrink-0 rounded-[6px] bg-coral text-paper font-serif leading-none;
+    box-shadow: 0 0 0 1px rgba(201,154,74,.55), 0 0 0 3px rgba(201,154,74,.12);
+  }
+
+  /* Thin gold corner brackets, echoes Balinese carved-panel framing */
+  .frame-corners { @apply relative; }
+  .frame-corners::before, .frame-corners::after {
+    content: '';
+    position: absolute;
+    width: 22px; height: 22px;
+    border: 1.5px solid theme('colors.gold');
+    z-index: 10;
+    pointer-events: none;
+    opacity: .85;
+  }
+  .frame-corners::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .frame-corners::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+  /* Repeating seigaiha wave-crest divider between sections */
+  .wave-divider {
+    height: 26px;
+    background-image: theme('backgroundImage.seigaiha');
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity: .55;
+  }
+
+  .menu-tab {
+    @apply px-5 py-2.5 rounded-full text-sm font-medium border transition-colors font-serif tracking-wide;
+  }
 }
 
 @keyframes marquee {
