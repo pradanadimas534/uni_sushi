@@ -157,14 +157,14 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
         <button aria-label="Close" onClick={() => setMobileOpen(false)} className="absolute top-6 right-6 text-3xl font-light">×</button>
         {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
           link.to.startsWith('#') ? (
-            <a key={link.to} href={link.to} onClick={(e) => { setMobileOpen(false); handleHashScroll(e, link.to); }} className="text-2xl font-serif">
+            <a key={link.to} href={link.to} onClick={(e) => { setMobileOpen(false); handleHashScroll(e, link.to); }} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">
               {link.label}
             </a>
           ) : (
-            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-2xl font-serif">{link.label}</Link>
+            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">{link.label}</Link>
           )
         ))}
-        <a href={wa} onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold bg-gold text-ink mt-4">Reserve →</a>
+        <a href={wa} onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-[clamp(0.85rem,1.1vw,1.125rem)] font-semibold bg-gold text-ink mt-4">Reserve →</a>
       </div>
     </>
   );
