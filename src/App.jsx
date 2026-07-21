@@ -310,7 +310,8 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       </section>
       <div className="wave-divider bg-black/25" />
 
-      {/* FEATURED MENU SLIDER (Autoplay & Samakan Desain dengan MenuPage) */}
+
+      {/* FEATURED MENU SLIDER */}
       <section className="py-24 md:py-32 bg-black/40 overflow-hidden" id="menu-highlight">
         <div className="uc-wrap max-w-6xl mx-auto px-4">
           <div className="reveal text-center max-w-xl mx-auto mb-4">
@@ -324,8 +325,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
           </p>
 
           {(() => {
-            const menuList = Array.isArray(items) ? items : Array.isArray(katalog) ? katalog : [];
-            // Ambil minimal 10 item
+            const menuList = Array.isArray(katalog) ? katalog : [];
             const featuredMenu = menuList.slice(0, 10);
 
             if (featuredMenu.length === 0) {
@@ -352,39 +352,74 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
                     }}
                     className="pb-14"
                   >
-                    {featuredMenu.map((it, index) => (
-                      <SwiperSlide key={it.id || index} className="h-auto">
-                        <div className="group relative flex flex-col justify-between h-full rounded-2xl overflow-hidden bg-paper/[0.03] border border-paper/10 hover:border-gold/50 transition-all duration-300 shadow-xl hover:-translate-y-1">
-                          {/* Gambar dengan rasio 4/5 */}
-                          <div className="relative w-full aspect-[4/5] overflow-hidden bg-black/40">
-                            {it.image || it.img ? (
-                              <img
-                                src={imgSrc(it.image || it.img)}
-                                alt={it.name || 'Menu Item'}
-                                loading="lazy"
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex flex-col items-center justify-center text-paper/30">
-                                <span className="text-4xl mb-2">{emojiFor(it.name)}</span>
-                                <span className="text-xs">Gambar Tidak Tersedia</span>
+                    {featuredMenu.map((it, index) => {
+                      const itemWa = typeof wa !== 'undefined'
+                        ? wa
+                        : `https://wa.me/6281234567890?text=Halo,%20saya%20ingin%20pesan%20${encodeURIComponent(it.name || 'Menu')}`;
+
+                      return (
+                        <SwiperSlide key={it.id || index} className="h-auto">
+                          <div className="group relative flex flex-col justify-between h-full rounded-2xl overflow-hidden bg-paper/[0.03] border border-paper/10 hover:border-gold/50 transition-all duration-300 shadow-xl hover:-translate-y-1">
+
+                            {/* Gambar dengan rasio 4/5 */}
+                            <div className="relative w-full aspect-[4/5] overflow-hidden bg-black/40">
+                              {it.image || it.img ? (
+                                <img
+                                  src={typeof imgSrc === 'function' ? imgSrc(it.image || it.img) : (it.image || it.img)}
+                                  alt={it.name || 'Menu Item'}
+                                  loading="lazy"
+                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center text-paper/30">
+                                  <span className="text-4xl mb-2">
+                                    {typeof emojiFor === 'function' ? emojiFor(it.name) : '🍽️'}
+                                  </span>
+                                  <span className="text-xs">Gambar Tidak Tersedia</span>
+                                </div>
+                              )}
+
+                              {it.category && (
+                                <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-gold text-[10px] font-semibold px-2.5 py-1 rounded-full border border-gold/20">
+                                  {it.category}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Konten Kartu */}
+                            <div className="p-5 flex-1 flex flex-col justify-between bg-black/30">
+                              <div>
+                                <div className="flex justify-between items-start gap-2 mb-2">
+                                  <h3 className="font-semibold text-base text-white group-hover:text-gold transition-colors">
+                                    {it.name || 'Nama Menu'}
+                                  </h3>
+                                  {it.price && (
+                                    <span className="text-gold font-bold text-sm whitespace-nowrap">
+                                      {typeof it.price === 'number' ? `Rp ${it.price.toLocaleString('id-ID')}` : it.price}
+                                    </span>
+                                  )}
+                                </div>
+                                {it.description && (
+                                  <p className="text-paper/60 text-xs line-clamp-2 mb-4">
+                                    {it.description}
+                                  </p>
+                                )}
                               </div>
-                            )}
-                          </div>
 
-                          {/* Konten Kartu (Persis MenuPage) */}
-                          <div className="p-5 flex-1 flex flex-col justify-between bg-black/30">
+                              <a
+                                href={itemWa}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full py-2.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs transition-all text-center block mt-2"
+                              >
+                                Pesan via WhatsApp
+                              </a>
+                            </div>
 
-                            <a
-                              href={wa}
-                              className="w-full py-2.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs transition-all text-center block mt-2"
-                            >
-                              Pesan via WhatsApp
-                            </a>
                           </div>
-                        </div>
-                      </SwiperSlide>
-                    ))}
+                        </SwiperSlide>
+                      );
+                    })}
                   </Swiper>
                 </div>
 
