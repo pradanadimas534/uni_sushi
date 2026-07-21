@@ -135,21 +135,21 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
     <>
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-ink/95 backdrop-blur shadow-lg py-3' : 'bg-gradient-to-b from-black/50 to-transparent py-6'}`}>
         <div className="uc-wrap flex items-center justify-between">
-          <Link to="/" className="font-serif text-xl font-semibold flex items-center gap-3 text-paper">
+          <Link to="/" className="font-serif text-[clamp(1rem,1.4vw,1.5rem)] font-semibold flex items-center gap-3 text-paper">
             <img src={imgSrc(content.logo)} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
             {content.brand}
           </Link>
           <div className="hidden md:flex items-center gap-8">
             {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
               link.to.startsWith('#') ? (
-                <a key={link.to} href={link.to} onClick={(e) => handleHashScroll(e, link.to)} className="text-sm font-medium text-paper/75 hover:text-gold transition-colors">
+                <a key={link.to} href={link.to} onClick={(e) => handleHashScroll(e, link.to)} className="text-[clamp(0.8rem,1vw,1.05rem)] font-medium text-paper/75 hover:text-gold transition-colors">
                   {link.label}
                 </a>
               ) : (
-                <Link key={link.to} to={link.to} className="text-sm font-medium text-paper/75 hover:text-gold transition-colors">{link.label}</Link>
+                <Link key={link.to} to={link.to} className="text-[clamp(0.8rem,1vw,1.05rem)] font-medium text-paper/75 hover:text-gold transition-colors">{link.label}</Link>
               )
             ))}
-            <a href={wa} className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-xs font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">Reserve</a>
+            <a href={wa} className="inline-flex items-center justify-center rounded-full px-[clamp(1rem,1.5vw,1.5rem)] py-[clamp(0.5rem,0.9vw,0.9rem)] text-[clamp(0.7rem,0.9vw,0.95rem)] font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">Reserve</a>
           </div>
           <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="md:hidden p-2 text-paper">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
@@ -158,17 +158,17 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
       </nav>
 
       <div className={`fixed inset-0 z-[60] bg-ink text-paper flex flex-col items-center justify-center gap-8 transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <button aria-label="Close" onClick={() => setMobileOpen(false)} className="absolute top-6 right-6 text-3xl">×</button>
+        <button aria-label="Close" onClick={() => setMobileOpen(false)} className="absolute top-6 right-6 text-[clamp(1.5rem,3vw,2.25rem)]">×</button>
         {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
           link.to.startsWith('#') ? (
-            <a key={link.to} href={link.to} onClick={(e) => { setMobileOpen(false); handleHashScroll(e, link.to); }} className="text-2xl font-serif">
+            <a key={link.to} href={link.to} onClick={(e) => { setMobileOpen(false); handleHashScroll(e, link.to); }} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">
               {link.label}
             </a>
           ) : (
-            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-2xl font-serif">{link.label}</Link>
+            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">{link.label}</Link>
           )
         ))}
-        <a href={wa} onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold bg-gold text-ink mt-4">Reserve →</a>
+        <a href={wa} onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-[clamp(0.85rem,1.1vw,1.125rem)] font-semibold bg-gold text-ink mt-4">Reserve →</a>
       </div>
     </>
   );
@@ -180,30 +180,31 @@ function PageFooter({ content, wa }) {
       <div className="uc-wrap">
         <div className="grid md:grid-cols-3 gap-10 mb-14">
           <div>
-            <div className="font-serif text-xl font-semibold flex items-center gap-3 mb-3">
+            <div className="font-serif text-[clamp(1.1rem,1.5vw,1.5rem)] font-semibold flex items-center gap-3 mb-3">
               <img src={imgSrc(content.logo)} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />{content.brand}
             </div>
-            <p className="text-paper/55 text-sm max-w-xs leading-relaxed">{content.heroLede}</p>
+            <p className="text-paper/55 text-[clamp(0.85rem,1.05vw,1.05rem)] max-w-sm leading-relaxed">{content.heroLede}</p>
           </div>
           <div>
-            <h4 className="text-xs uppercase tracking-wide text-gold font-semibold mb-4">Explore</h4>
+            <h4 className="text-[clamp(0.7rem,0.85vw,0.875rem)] uppercase tracking-wide text-gold font-semibold mb-4">Explore</h4>
             <div className="flex flex-col gap-2">
-              <Link to="/" className="text-paper/65 text-sm hover:text-gold">Home</Link>
-              <Link to="/menu" className="text-paper/65 text-sm hover:text-gold">Menu</Link>
-              <a href="#katalog" onClick={(e) => handleHashScroll(e, '#katalog')} className="text-paper/65 text-sm hover:text-gold">Catalog</a>
-              <a href="#reviews" onClick={(e) => handleHashScroll(e, '#reviews')} className="text-paper/65 text-sm hover:text-gold">Reviews</a>
+              <Link to="/" className="text-paper/65 text-[clamp(0.85rem,1.05vw,1.05rem)] hover:text-gold">Home</Link>
+              <Link to="/menu" className="text-paper/65 text-[clamp(0.85rem,1.05vw,1.05rem)] hover:text-gold">Menu</Link>
+              <a href="#katalog" onClick={(e) => handleHashScroll(e, '#katalog')} className="text-paper/65 text-[clamp(0.85rem,1.05vw,1.05rem)] hover:text-gold">Catalog</a>
+              <a href="#reviews" onClick={(e) => handleHashScroll(e, '#reviews')} className="text-paper/65 text-[clamp(0.85rem,1.05vw,1.05rem)]
+               hover:text-gold">Reviews</a>
             </div>
           </div>
           <div>
-            <h4 className="text-xs uppercase tracking-wide text-gold font-semibold mb-4">Connect</h4>
+            <h4 className="text-[clamp(0.7rem,0.85vw,0.875rem)] uppercase tracking-wide text-gold font-semibold mb-4">Connect</h4>
             <div className="flex flex-col gap-2">
-              <a href={wa} className="text-paper/65 text-sm hover:text-gold">WhatsApp</a>
-              <a href={`https://instagram.com/${content.instagram || ''}`} className="text-paper/65 text-sm hover:text-gold">Instagram</a>
-              <a href={`mailto:${content.email || ''}`} className="text-paper/65 text-sm hover:text-gold">Email</a>
+              <a href={wa} className="text-paper/65 text-[clamp(0.85rem,1.05vw,1.05rem)] hover:text-gold">WhatsApp</a>
+              <a href={`https://instagram.com/${content.instagram || ''}`} className="text-paper/65 text-[clamp(0.85rem,1.05vw,1.05rem)] hover:text-gold">Instagram</a>
+              <a href={`mailto:${content.email || ''}`} className="text-paper/65 text-[clamp(0.85rem,1.05vw,1.05rem)] hover:text-gold">Email</a>
             </div>
           </div>
         </div>
-        <div className="border-t border-paper/10 pt-6 flex flex-wrap justify-between gap-3 text-xs text-paper/45">
+        <div className="border-t border-paper/10 pt-6 flex flex-wrap justify-between gap-3 text-[clamp(0.7rem,0.85vw,0.875rem)] text-paper/45">
           <span>© {new Date().getFullYear()} {content.brand} · Kuta, Bali</span>
           <a href="/admin/" className="hover:text-gold">Admin Login →</a>
         </div>
@@ -237,12 +238,12 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
           <img
             src={imgSrc(content.logo)}
             alt={`${content.brand} Logo`}
-            className="w-24 sm:w-32 md:w-36 aspect-square rounded-full object-cover border-4 border-white/20 shadow-2xl mb-4" />
+            className="w-[clamp(4.5rem,10vw,14rem)] aspect-square rounded-full object-cover border-4 border-white/20 shadow-2xl mb-4" />
           {/* BLOK LOGO TULISAN SESUAI GAMBAR 2 */}
           <div className="flex flex-col items-center my-2 select-none">
             {/* "Uni" - Font Caveat (Cursive Brush Oranye) */}
             <span
-              className="text-6xl sm:text-7xl md:text-8xl text-[#FF5722] leading-none drop-shadow-md -mb-3 z-10"
+              className="text-[clamp(3rem,9vw,11rem)] text-[#FF5722] leading-none drop-shadow-md -mb-3 z-10"
               style={{ fontFamily: "'Caveat', cursive", fontWeight: 700 }}
             >
               Uni
@@ -250,7 +251,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
 
             {/* "SUSHI" - Font Permanent Marker (Bold Brush Putih) */}
             <span
-              className="text-5xl sm:text-6xl md:text-7xl text-white uppercase tracking-wider leading-none drop-shadow-xl"
+              className="text-[clamp(2.5rem,7.5vw,9rem)] text-white uppercase tracking-wider leading-none drop-shadow-xl"
               style={{ fontFamily: "'Permanent Marker', cursive" }}
             >
               SUSHI
@@ -259,18 +260,18 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
             {/* Tagline "WE SERVE THE BEST" */}
             <div className="flex items-center gap-3 mt-4 text-paper/70">
               <span className="w-10 h-[1px] bg-paper/30"></span>
-              <span className="text-xs sm:text-sm uppercase tracking-[0.3em] font-semibold text-paper/90">
+              <span className="text-[clamp(0.75rem,1.3vw,1.375rem)] uppercase tracking-[0.3em] font-semibold text-paper/90">
                 WE SERVE THE BEST
               </span>
               <span className="w-10 h-[1px] bg-paper/30"></span>
             </div>
           </div>
 
-          <p className="text-paper/75 leading-relaxed mt-6 mb-9 max-w-xl mx-auto">{content.heroLede}</p>
+          <p className="text-[clamp(0.875rem,1.4vw,1.375rem)] text-paper/75 leading-relaxed mt-6 mb-9 max-w-2xl mx-auto">{content.heroLede}</p>
 
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link to="/menu" className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">Explore Menu</Link>
-            <a href={wa} className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold border border-paper/40 text-paper hover:bg-paper hover:text-ink transition-colors">Reserve via WhatsApp</a>
+            <Link to="/menu" className="inline-flex items-center justify-center rounded-full px-[clamp(1.25rem,2vw,2rem)] py-[clamp(0.75rem,1.2vw,1.125rem)] text-[clamp(0.8rem,1.1vw,1.125rem)] font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">Explore Menu</Link>
+            <a href={wa} className="inline-flex items-center justify-center rounded-full px-[clamp(1.25rem,2vw,2rem)] py-[clamp(0.75rem,1.2vw,1.125rem)] text-[clamp(0.8rem,1.1vw,1.125rem)] font-semibold border border-paper/40 text-paper hover:bg-paper hover:text-ink transition-colors">Reserve via WhatsApp</a>
           </div>
         </div>
         <a href="#about" onClick={(e) => handleHashScroll(e, '#about')} aria-label="Scroll" className="absolute bottom-8 left-1/2 -translate-x-1/2 text-paper/60 animate-bounce">
@@ -300,7 +301,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
               <div className="eyebrow mb-3 text-gold">
                 {content?.aboutEyebrow}
               </div>
-              <p className="text-paper/65 leading-relaxed whitespace-pre-line text-sm md:text-base">
+              <p className="text-paper/65 leading-relaxed whitespace-pre-line text-[clamp(0.9rem,1.3vw,1.25rem)]">
                 {content?.aboutText}
               </p>
             </div>
@@ -316,11 +317,11 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
         <div className="uc-wrap max-w-6xl mx-auto px-4">
           <div className="reveal text-center max-w-xl mx-auto mb-4">
             <div className="eyebrow justify-center flex mb-3 text-gold">Our Selection</div>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white">
+            <h2 className="text-[clamp(1.75rem,4vw,4rem)] font-semibold text-white">
               Featured <span className="text-gold">Menu</span>
             </h2>
           </div>
-          <p className="reveal text-center text-paper/55 text-sm max-w-lg mx-auto mb-12">
+          <p className="reveal text-center text-paper/55 text-[clamp(0.85rem,1.1vw,1.125rem)] max-w-2xl mx-auto mb-12">
             Explore our signature dishes crafted with fresh ingredients and authentic flavors.
           </p>
 
@@ -390,17 +391,17 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
                             <div className="p-5 flex-1 flex flex-col justify-between bg-black/30">
                               <div>
                                 <div className="flex justify-between items-start gap-2 mb-2">
-                                  <h3 className="font-semibold text-base text-white group-hover:text-gold transition-colors">
+                                  <h3 className="font-semibold text-[clamp(0.95rem,1.2vw,1.25rem)] text-white group-hover:text-gold transition-colors">
                                     {it.name || 'Nama Menu'}
                                   </h3>
                                   {it.price && (
-                                    <span className="text-gold font-bold text-sm whitespace-nowrap">
+                                    <span className="text-gold font-bold text-[clamp(0.85rem,1.1vw,1.125rem)] whitespace-nowrap">
                                       {typeof it.price === 'number' ? `Rp ${it.price.toLocaleString('id-ID')}` : it.price}
                                     </span>
                                   )}
                                 </div>
                                 {it.description && (
-                                  <p className="text-paper/60 text-xs line-clamp-2 mb-4">
+                                  <p className="text-paper/60 text-[clamp(0.8rem,1.1vw,1.125rem)] line-clamp-2 mb-4">
                                     {it.description}
                                   </p>
                                 )}
@@ -410,7 +411,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
                                 href={itemWa}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full py-2.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs transition-all text-center block mt-2"
+                                className="w-full py-2.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-[clamp(0.7rem,0.9vw,0.9rem)] transition-all text-center block mt-2"
                               >
                                 Pesan via WhatsApp
                               </a>
@@ -425,7 +426,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
 
                 <Link
                   to="/menu"
-                  className="inline-flex items-center justify-center rounded-full px-8 py-3.5 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center rounded-full px-[clamp(1.5rem,2.2vw,2.5rem)] py-[clamp(0.85rem,1.3vw,1.25rem)] text-[clamp(0.85rem,1.1vw,1.125rem)] font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg"
                 >
                   See Full Menu
                 </Link>
@@ -446,7 +447,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
             <div className="eyebrow justify-center flex mb-3 text-gold">
               Google Reviews
             </div>
-            <h2 className="text-3xl md:text-4xl font-semibold text-paper">
+            <h2 className="text-[clamp(1.75rem,4vw,4rem)] font-semibold text-paper">
               What Our <span className="text-gold">Customers Say</span>
             </h2>
           </div>
@@ -463,45 +464,45 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
         <div className="uc-wrap">
           <div className="reveal text-center max-w-xl mx-auto mb-14">
             <div className="eyebrow justify-center flex mb-3">Come Say Hi</div>
-            <h2 className="text-3xl md:text-4xl font-semibold">Visit <span className="text-gold">Us</span></h2>
+            <h2 className="text-[clamp(1.75rem,4vw,4rem)] font-semibold">Visit <span className="text-gold">Us</span></h2>
           </div>
           <div className="grid md:grid-cols-2 gap-10 items-start">
             <div className="reveal space-y-6">
               <div className="flex gap-4">
                 <div className="w-11 h-11 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold"><MapPin size={19} /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1">Location</div>
-                  <div className="text-sm text-paper/60">{content.address}</div>
+                  <div className="font-serif font-semibold text-[clamp(0.95rem,1.2vw,1.25rem)] mb-1">Location</div>
+                  <div className="text-[clamp(0.85rem,1.1vw,1.125rem)] text-paper/60">{content.address}</div>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="w-11 h-11 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold"><Phone size={19} /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1">Phone</div>
-                  <div className="text-sm text-paper/60">{content.phone}</div>
+                  <div className="font-serif font-semibold text-[clamp(0.95rem,1.2vw,1.25rem)] mb-1">Phone</div>
+                  <div className="text-[clamp(0.85rem,1.1vw,1.125rem)] text-paper/60">{content.phone}</div>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="w-11 h-11 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold"><Mail size={19} /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1">Email</div>
-                  <div className="text-sm text-paper/60">{content.email}</div>
+                  <div className="font-serif font-semibold text-[clamp(0.95rem,1.2vw,1.25rem)] mb-1">Email</div>
+                  <div className="text-[clamp(0.85rem,1.1vw,1.125rem)] text-paper/60">{content.email}</div>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="w-11 h-11 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold"><Clock size={19} /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1">Opening Hours</div>
+                  <div className="font-serif font-semibold text-[clamp(0.95rem,1.2vw,1.25rem)] mb-1">Opening Hours</div>
                   {(content.hours || []).map((h, i) => {
                     const label = h.d || h.day || h.label || 'Hours';
                     const value = h.h || h.time || h.hours || '';
-                    return <div className="text-sm text-paper/60" key={i}>{label}: <span className="text-paper/80">{value}</span></div>;
+                    return <div className="text-[clamp(0.85rem,1.1vw,1.125rem)] text-paper/60" key={i}>{label}: <span className="text-paper/80">{value}</span></div>;
                   })}
                 </div>
               </div>
               <div className="flex flex-wrap gap-3 pt-3">
-                <a href={wa} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">WhatsApp</a>
-                <a href={`https://instagram.com/${content.instagram || ''}`} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold border border-paper/25 text-paper hover:border-paper/50 transition-colors">@{content.instagram}</a>
+                <a href={wa} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-[clamp(0.85rem,1.1vw,1.125rem)] font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">WhatsApp</a>
+                <a href={`https://instagram.com/${content.instagram || ''}`} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-[clamp(0.85rem,1.1vw,1.125rem)] font-semibold border border-paper/25 text-paper hover:border-paper/50 transition-colors">@{content.instagram}</a>
               </div>
             </div>
             <div className="reveal rounded-2xl overflow-hidden bg-black/40 border border-paper/10 min-h-[420px] relative">
@@ -545,10 +546,10 @@ function MenuPage({ content, items, wa, scrolled, mobileOpen, setMobileOpen }) {
         <div className="uc-wrap max-w-6xl mx-auto px-4">
           <div className="reveal text-center max-w-2xl mx-auto mb-12">
             <div className="eyebrow justify-center flex mb-3">Our Menu</div>
-            <h1 className="text-3xl md:text-4xl font-semibold">
+            <h1 className="text-[clamp(1.75rem,4vw,4rem)] font-semibold">
               Browse the <span className="text-gold">Menu</span>
             </h1>
-            <p className="text-paper/60 mt-4 leading-relaxed">
+            <p className="text-[clamp(0.9rem,1.2vw,1.25rem)] text-paper/60 mt-4 leading-relaxed">
               Jelajahi seluruh pilihan menu kami. Ketuk pada gambar untuk memperbesar detail poster.
             </p>
           </div>
@@ -583,7 +584,7 @@ function MenuPage({ content, items, wa, scrolled, mobileOpen, setMobileOpen }) {
                   )}
 
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                    <span className="px-4 py-2 rounded-full bg-gold/90 text-ink text-xs font-semibold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <span className="px-4 py-2 rounded-full bg-gold/90 text-ink text-[clamp(0.7rem,0.9vw,0.9rem)] font-semibold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                       Perbesar Poster
                     </span>
                   </div>
@@ -591,7 +592,7 @@ function MenuPage({ content, items, wa, scrolled, mobileOpen, setMobileOpen }) {
 
                 <div className="p-4 bg-paper/[0.02] border-t border-paper/10 flex items-center justify-between">
                   <div className="pr-2 truncate">
-                    <p className="text-gold font-semibold text-sm">
+                    <p className="text-gold font-semibold text-[clamp(0.85rem,1.1vw,1.125rem)]">
                       {it.price && typeof rupiah === 'function'
                         ? rupiah(it.price)
                         : it.name || 'Menu Item'}
@@ -604,7 +605,7 @@ function MenuPage({ content, items, wa, scrolled, mobileOpen, setMobileOpen }) {
                     )}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="shrink-0 px-4 py-1.5 bg-gold hover:bg-gold/80 text-ink rounded-lg text-xs font-semibold transition-colors"
+                    className="shrink-0 px-[clamp(0.75rem,1.1vw,1.25rem)] py-[clamp(0.35rem,0.6vw,0.6rem)] bg-gold hover:bg-gold/80 text-ink rounded-lg text-[clamp(0.7rem,0.9vw,0.9rem)] font-semibold transition-colors"
                   >
                     Pesan Via WA
                   </a>
