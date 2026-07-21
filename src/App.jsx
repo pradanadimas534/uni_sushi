@@ -12,7 +12,7 @@ import 'swiper/css/navigation';
 const rupiah = (n) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
 
 // Nyalakan mode maintenance dengan set ke true.
-const MAINTENANCE_MODE = false;
+const MAINTENANCE_MODE = (window.MAINTENANCE_MODE);
 
 function Maintenance({ content, wa }) {
   return (
