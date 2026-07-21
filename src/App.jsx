@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Clock, ChevronDown } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, ChevronDown, Star } from 'lucide-react';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
+import GoogleReviewsWidget from 'google-reviews-widget';
+
 
 const rupiah = (n) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
 
@@ -12,7 +22,7 @@ function Maintenance({ content, wa }) {
     <div className="min-h-screen bg-ink text-paper flex items-center justify-center px-6 relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.06] bg-seigaiha" style={{ backgroundSize: '56px 28px' }} />
       <div className="relative text-center max-w-lg">
-        <img src="/public/images/logo.jpeg" alt={content.brand || 'Uni Sushi'} className="w-20 h-20 rounded-full mx-auto mb-8 object-cover ring-1 ring-gold/40" />
+        <img src={imgSrc(content.logo)} alt={content.brand || 'Uni Sushi'} className="w-20 h-20 rounded-full mx-auto mb-8 object-cover ring-1 ring-gold/40" />
         <div className="eyebrow justify-center flex mb-4">Sedang Dalam Perbaikan</div>
         <h1 className="text-3xl md:text-4xl font-semibold mb-5 leading-tight">
           {content.brand || 'Uni Sushi'} <span className="text-gold">sedang berbenah</span>
@@ -78,7 +88,6 @@ function useReveal() {
   }, []);
 }
 
-// PERBAIKAN: Fungsi helper untuk menangani navigasi smooth scroll pada HashRouter
 function handleHashScroll(e, to) {
   if (to.startsWith('#')) {
     e.preventDefault();
@@ -90,14 +99,101 @@ function handleHashScroll(e, to) {
   }
 }
 
+function ElfsightReviews() {
+  useEffect(() => {
+    // Memuat script Elfsight hanya sekali saat komponen dimuat
+    const scriptId = 'elfsight-platform-script';
+    let script = document.getElementById(scriptId);
+
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.src = 'https://elfsightcdn.com/platform.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  return (
+    <div
+      className="elfsight-app-88a07733-6995-46aa-872b-7ad4c9c0659b"
+      data-elfsight-app-lazy
+    />
+  );
+
+  return (
+    <>
+      <div className="grid md:grid-cols-[280px_1fr] gap-10 items-start">
+        {/* KIRI — ringkasan rating */}
+        <div className="reveal rounded-2xl border border-paper/10 bg-paper/[0.03] p-8 text-center md:text-left md:sticky md:top-28">
+          <div className="text-5xl font-bold text-gold mb-2">{state.rating?.toFixed(1) ?? '—'}</div>
+          <div className="flex gap-1 justify-center md:justify-start mb-3">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <Star key={n} size={20} className={n <= Math.round(state.rating || 0) ? 'fill-gold text-gold' : 'text-paper/20'} />
+            ))}
+          </div>
+          {state.total > 0 && (
+            <p className="text-paper/55 text-sm">Berdasarkan {state.total} ulasan asli pengunjung di Google</p>
+          )}
+        </div>
+
+        {/* KANAN — 3 ulasan terbaik */}
+        <div className="flex flex-col gap-5">
+          {state.reviews.length === 0 ? (
+            <p className="reveal text-paper/45">Belum ada ulasan yang tersedia.</p>
+          ) : (
+            state.reviews.map((r, i) => (
+              <div key={i} className="reveal rounded-2xl border border-paper/10 bg-paper/[0.03] p-6 hover:border-gold/40 transition-all duration-300">
+                <div className="flex items-center gap-3 mb-3">
+                  {r.profile_photo_url ? (
+                    <img src={r.profile_photo_url} alt={r.author_name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" referrerPolicy="no-referrer" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gold/20 text-gold flex items-center justify-center font-semibold flex-shrink-0">
+                      {r.author_name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="font-serif font-semibold text-sm truncate">{r.author_name}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star key={n} size={12} className={n <= r.rating ? 'fill-gold text-gold' : 'text-paper/20'} />
+                        ))}
+                      </div>
+                      {r.relative_time_description && (
+                        <span className="text-xs text-paper/40 capitalize">· {r.relative_time_description}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-paper/65 leading-relaxed">{r.text}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="text-center mt-12">
+        <a
+          href={fallbackHref}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center justify-center rounded-full px-6 py-3 text-xs font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors"
+        >
+          Baca Semua Ulasan di Google Maps →
+        </a>
+      </div>
+    </>
+  );
+}
+
 function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink = true }) {
-  // PERBAIKAN: Mengubah target route internal menjadi element selector ID halaman utama yang ada
   const primaryLinks = [
     { label: 'Home', to: '#top' },
     { label: 'Our Story', to: '#about' },
     { label: 'Menu', to: '/menu' },
-    { label: 'Gallery', to: '#gallery' },
-    { label: 'Visit', to: '#visit' }, // Disesuaikan ke ID seksi katalog/footer terdekat
+    { label: 'Reviews', to: '#reviews' }, // Diubah dari Gallery ke Reviews
+    { label: 'Visit', to: '#visit' },
   ];
 
   return (
@@ -105,7 +201,7 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-ink/95 backdrop-blur shadow-lg py-3' : 'bg-gradient-to-b from-black/50 to-transparent py-6'}`}>
         <div className="uc-wrap flex items-center justify-between">
           <Link to="/" className="font-serif text-xl font-semibold flex items-center gap-3 text-paper">
-            <img src="/public/images/logo.jpeg" alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+            <img src= {imgSrc(content.logo)} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
             {content.brand}
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -150,7 +246,7 @@ function PageFooter({ content, wa }) {
         <div className="grid md:grid-cols-3 gap-10 mb-14">
           <div>
             <div className="font-serif text-xl font-semibold flex items-center gap-3 mb-3">
-              <img src="/public/images/logo.jpeg" alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />{content.brand}
+              <img src={imgSrc(content.logo)} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />{content.brand}
             </div>
             <p className="text-paper/55 text-sm max-w-xs leading-relaxed">{content.heroLede}</p>
           </div>
@@ -159,8 +255,8 @@ function PageFooter({ content, wa }) {
             <div className="flex flex-col gap-2">
               <Link to="/" className="text-paper/65 text-sm hover:text-gold">Home</Link>
               <Link to="/menu" className="text-paper/65 text-sm hover:text-gold">Menu</Link>
-              {/* PERBAIKAN: Menggunakan anchor tag hash dengan handler scroll */}
-              <a href="#katalog" onClick={(e) => handleHashScroll(e, '#katalog')} className="text-paper/65 text-sm hover:text-gold">Visit</a>
+              <a href="#katalog" onClick={(e) => handleHashScroll(e, '#katalog')} className="text-paper/65 text-sm hover:text-gold">Catalog</a>
+              <a href="#reviews" onClick={(e) => handleHashScroll(e, '#reviews')} className="text-paper/65 text-sm hover:text-gold">Reviews</a>
             </div>
           </div>
           <div>
@@ -184,10 +280,6 @@ function PageFooter({ content, wa }) {
 function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, setMobileOpen }) {
   useReveal();
 
-  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
-
-  const featured = items.filter((i) => i.featured).slice(0, 3);
-  const galleryImgs = data.gallery || [];
   const heroImg = content.heroImage;
 
   return (
@@ -204,18 +296,49 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
         <div className="absolute inset-0 bg-black/60" />
         <div className="absolute inset-0 opacity-[0.08] bg-seigaiha" style={{ backgroundSize: '56px 28px' }} />
 
-        <div className="relative uc-wrap max-w-2xl mx-auto pt-24">
-          <div className="eyebrow justify-center flex mb-5">{content.heroEyebrow}</div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.1] mb-6">
-            Welcome to <span className="text-gold">{content.brand}</span>
-          </h1>
-          <p className="text-paper/75 leading-relaxed mb-9 max-w-xl mx-auto">{content.heroLede}</p>
+        <div className="relative uc-wrap max-w-2xl mx-auto pt-24 flex flex-col items-center">
+          <div className="eyebrow justify-center flex mb-4">{content.heroEyebrow}</div>
+
+          <img
+            src={imgSrc(content.logo)}
+            alt={`${content.brand} Logo`}
+            className="w-24 sm:w-32 md:w-36 aspect-square rounded-full object-cover border-4 border-white/20 shadow-2xl mb-4" />
+          {/* BLOK LOGO TULISAN SESUAI GAMBAR 2 */}
+          <div className="flex flex-col items-center my-2 select-none">
+            {/* "Uni" - Font Caveat (Cursive Brush Oranye) */}
+            <span
+              className="text-6xl sm:text-7xl md:text-8xl text-[#FF5722] leading-none drop-shadow-md -mb-3 z-10"
+              style={{ fontFamily: "'Caveat', cursive", fontWeight: 700 }}
+            >
+              Uni
+            </span>
+
+            {/* "SUSHI" - Font Permanent Marker (Bold Brush Putih) */}
+            <span
+              className="text-5xl sm:text-6xl md:text-7xl text-white uppercase tracking-wider leading-none drop-shadow-xl"
+              style={{ fontFamily: "'Permanent Marker', cursive" }}
+            >
+              SUSHI
+            </span>
+
+            {/* Tagline "WE SERVE THE BEST" */}
+            <div className="flex items-center gap-3 mt-4 text-paper/70">
+              <span className="w-10 h-[1px] bg-paper/30"></span>
+              <span className="text-xs sm:text-sm uppercase tracking-[0.3em] font-semibold text-paper/90">
+                WE SERVE THE BEST
+              </span>
+              <span className="w-10 h-[1px] bg-paper/30"></span>
+            </div>
+          </div>
+
+          <p className="text-paper/75 leading-relaxed mt-6 mb-9 max-w-xl mx-auto">{content.heroLede}</p>
+
           <div className="flex flex-wrap gap-4 justify-center">
             <Link to="/menu" className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">Explore Menu</Link>
             <a href={wa} className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold border border-paper/40 text-paper hover:bg-paper hover:text-ink transition-colors">Reserve via WhatsApp</a>
           </div>
         </div>
-        {/* PERBAIKAN: Menggunakan onClick handler agar bounce anchor bekerja */}
+
         <a href="#about" onClick={(e) => handleHashScroll(e, '#about')} aria-label="Scroll" className="absolute bottom-8 left-1/2 -translate-x-1/2 text-paper/60 animate-bounce">
           <ChevronDown size={26} />
         </a>
@@ -225,147 +348,118 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
 
       <section className="py-24 md:py-32" id="about">
         <div className="uc-wrap">
-          <div className="grid lg:grid-cols-[1.5fr_0.8fr] gap-16 items-start">
-            <div className="reveal">
-              <div className="eyebrow mb-3">{content.aboutEyebrow}</div>
-              <h2 className="text-3xl md:text-4xl font-semibold mb-6">
-                Our <span className="text-gold">Story</span>
-              </h2>
-              <p className="text-paper/65 leading-relaxed whitespace-pre-line">{content.aboutText}</p>
-            </div>
-            <div className="reveal relative">
-              <div className="absolute left-3 top-2 bottom-2 w-[2px] bg-paper/10" />
-              {[
-                { year: '2016', title: 'Founded' },
-                { year: '2018', title: 'Signature Menu' },
-                { year: '2020', title: 'Community Events' },
-              ].map((item, i) => (
-                <div key={i} className="relative flex items-start gap-5 pb-12">
-                  <div className="z-10 w-6 h-6 rounded-full bg-gold border-4 border-ink shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-lg">{item.year}</h3>
-                    <p className="text-paper/55 text-sm">{item.title}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-          <div className="grid md:grid-cols-3 gap-6 mt-20">
-            {[
-              { emoji: '🍣', title: 'Edomae Craft', text: 'Nigiri and sashimi cut to order, in the unhurried tradition of a Tokyo sushi counter.' },
-              { emoji: '🌺', title: 'Island Ingredients', text: "Ocean-fresh catch and Bali's own produce, married with Japanese technique." },
-              { emoji: '🎐', title: 'Warm Hospitality', text: 'A gathering spot for celebrations and quiet dinners alike — Balinese warmth, Japanese precision.' },
-            ].map((item) => (
-              <div key={item.title} className="reveal rounded-2xl border border-paper/10 bg-black/20 p-8 text-center hover:-translate-y-2 hover:border-gold/40 transition-all duration-300">
-                <div className="w-16 h-16 rounded-full border border-gold/30 flex items-center justify-center mx-auto mb-5 text-3xl">{item.emoji}</div>
-                <h3 className="font-semibold text-lg mb-3">{item.title}</h3>
-                <p className="text-paper/60 text-sm">{item.text}</p>
+            {/* Kolom Gambar (Menggantikan Timeline Tahun) */}
+            <div className="reveal order-2 lg:order-1 flex justify-center">
+              <div className="relative group max-w-md w-full">
+                <img
+                  src={content?.aboutImage}
+                  alt="About Us"
+                  className="w-full h-auto object-cover rounded-2xl shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]"
+                />
               </div>
-            ))}
+            </div>
+
+            {/* Kolom Teks Konten */}
+            <div className="reveal order-1 lg:order-2">
+              <div className="eyebrow mb-3 text-gold">
+                {content?.aboutEyebrow}
+              </div>
+              <p className="text-paper/65 leading-relaxed whitespace-pre-line text-sm md:text-base">
+                {content?.aboutText}
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
-
       <div className="wave-divider bg-black/25" />
 
-      <section className="py-24 md:py-32 bg-black/40 overflow-hidden" id="katalog">
+      {/* FEATURED MENU SLIDER (Autoplay & Samakan Desain dengan MenuPage) */}
+      <section className="py-24 md:py-32 bg-black/40 overflow-hidden" id="menu-highlight">
         <div className="uc-wrap max-w-6xl mx-auto px-4">
           <div className="reveal text-center max-w-xl mx-auto mb-4">
-            <div className="eyebrow justify-center flex mb-3 text-gold">Our Highlights</div>
+            <div className="eyebrow justify-center flex mb-3 text-gold">Our Selection</div>
             <h2 className="text-3xl md:text-4xl font-semibold text-white">
-              Explore Our <span className="text-gold">Catalog</span>
+              Featured <span className="text-gold">Menu</span>
             </h2>
           </div>
           <p className="reveal text-center text-paper/55 text-sm max-w-lg mx-auto mb-12">
-            Browse through our exclusive experiences, spatial atmospheres, and signature culinary highlights.
+            Explore our signature dishes crafted with fresh ingredients and authentic flavors.
           </p>
 
           {(() => {
-            const [activeIndex, setActiveIndex] = useState(0);
-            const dataKatalog = Array.isArray(katalog) ? katalog : [];
+            const menuList = Array.isArray(items) ? items : Array.isArray(katalog) ? katalog : [];
+            // Ambil minimal 10 item
+            const featuredMenu = menuList.slice(0, 10);
 
-            const handlePrev = () => {
-              setActiveIndex((prev) => (prev === 0 ? dataKatalog.length - 1 : prev - 1));
-            };
-
-            const handleNext = () => {
-              setActiveIndex((prev) => (prev === dataKatalog.length - 1 ? 0 : prev + 1));
-            };
-
-            if (dataKatalog.length === 0) {
-              return <p className="text-center text-paper/45">Belum ada katalog tersedia.</p>;
+            if (featuredMenu.length === 0) {
+              return <p className="text-center text-paper/45">Belum ada menu tersedia.</p>;
             }
 
             return (
-              <div className="relative flex items-center justify-center h-[430px] md:h-[500px] w-full max-w-4xl mx-auto px-12">
-                <button
-                  onClick={handlePrev}
-                  type="button"
-                  className="absolute left-0 z-30 p-2.5 rounded-full bg-paper/90 hover:bg-paper text-ink shadow-lg transition-all focus:outline-none"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M15 18l-6-6 6-6" />
-                  </svg>
-                </button>
-
-                <div className="relative w-full h-full flex items-center justify-center">
-                  {dataKatalog.map((it, index) => {
-                    let position = index - activeIndex;
-                    if (position < -1) position = position + dataKatalog.length;
-                    if (position > 1) position = position - dataKatalog.length;
-
-                    const isActive = position === 0;
-                    const isLeft = position === -1;
-                    const isRight = position === 1;
-
-                    if (!isActive && !isLeft && !isRight) return null;
-
-                    return (
-                      <div
-                        key={it.id || index}
-                        className={`absolute w-[280px] md:w-[350px] h-[380px] md:h-[460px] rounded-xl overflow-hidden bg-paper/[0.04] border transition-all duration-500 ease-out flex flex-col ${isActive
-                          ? 'z-20 scale-100 opacity-100 border-gold/50 shadow-2xl translate-x-0'
-                          : isLeft
-                            ? 'z-10 scale-85 opacity-30 border-paper/10 -translate-x-[45%] md:-translate-x-[55%]'
-                            : 'z-10 scale-85 opacity-30 border-paper/10 translate-x-[45%] md:translate-x-[55%]'
-                          }`}
-                        style={{ backdropFilter: isActive ? 'none' : 'blur(3px)' }}
-                      >
-                        <div className="relative w-full h-[65%] overflow-hidden frame-corners bg-zinc-900">
-                          <img
-                            src={imgSrc(it.image)}
-                            alt={it.name || 'Catalog Image'}
-                            loading="lazy"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="p-5 flex-1 bg-black/40 border-t border-paper/5 flex flex-col justify-between">
-                          <div>
-                            <h3 className="font-serif font-semibold text-base md:text-lg mb-1 text-gold">
-                              {it.name || 'Untitled'}
-                            </h3>
-                            {it.description && (
-                              <p className="text-xs md:text-sm text-paper/55 line-clamp-3 leading-relaxed">
-                                {it.description}
-                              </p>
+              <div className="flex flex-col items-center gap-10">
+                <div className="w-full relative px-2">
+                  <Swiper
+                    modules={[Autoplay, Pagination, Navigation]}
+                    spaceBetween={24}
+                    slidesPerView={1}
+                    loop={featuredMenu.length > 3}
+                    autoplay={{
+                      delay: 3000,
+                      disableOnInteraction: false,
+                      pauseOnMouseEnter: true,
+                    }}
+                    pagination={{ clickable: true, dynamicBullets: true }}
+                    breakpoints={{
+                      640: { slidesPerView: 2, spaceBetween: 24 },
+                      1024: { slidesPerView: 3, spaceBetween: 32 },
+                    }}
+                    className="pb-14"
+                  >
+                    {featuredMenu.map((it, index) => (
+                      <SwiperSlide key={it.id || index} className="h-auto">
+                        <div className="group relative flex flex-col justify-between h-full rounded-2xl overflow-hidden bg-paper/[0.03] border border-paper/10 hover:border-gold/50 transition-all duration-300 shadow-xl hover:-translate-y-1">
+                          {/* Gambar dengan rasio 4/5 */}
+                          <div className="relative w-full aspect-[4/5] overflow-hidden bg-black/40">
+                            {it.image || it.img ? (
+                              <img
+                                src={imgSrc(it.image || it.img)}
+                                alt={it.name || 'Menu Item'}
+                                loading="lazy"
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center text-paper/30">
+                                <span className="text-4xl mb-2">{emojiFor(it.name)}</span>
+                                <span className="text-xs">Gambar Tidak Tersedia</span>
+                              </div>
                             )}
                           </div>
+
+                          {/* Konten Kartu (Persis MenuPage) */}
+                          <div className="p-5 flex-1 flex flex-col justify-between bg-black/30">
+
+                            <a
+                              href={wa}
+                              className="w-full py-2.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs transition-all text-center block mt-2"
+                            >
+                              Pesan via WhatsApp
+                            </a>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
                 </div>
 
-                <button
-                  onClick={handleNext}
-                  type="button"
-                  className="absolute right-0 z-30 p-2.5 rounded-full bg-paper/90 hover:bg-paper text-ink shadow-lg transition-all focus:outline-none"
+                <Link
+                  to="/menu"
+                  className="inline-flex items-center justify-center rounded-full px-8 py-3.5 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M9 18l6-6-6-6" />
-                  </svg>
-                </button>
+                  See Full Menu
+                </Link>
               </div>
             );
           })()}
@@ -374,92 +468,28 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
 
       <div className="wave-divider bg-black/25" />
 
-      <section className="py-24 md:py-32 bg-black/25 overflow-hidden" id="gallery">
+      {/* REVIEWS SECTION - AUTOMATIC FROM GOOGLE MAPS */}
+      {/* REVIEWS SECTION */}
+      <section className="py-24 md:py-32 bg-black/25 overflow-hidden" id="reviews">
         <div className="uc-wrap max-w-6xl mx-auto px-4">
-          <div className="reveal text-center max-w-xl mx-auto mb-12">
-            <div className="eyebrow justify-center flex mb-3">Ambience</div>
-            <h2 className="text-3xl md:text-4xl font-semibold">
-              Around <span className="text-gold">{content.brand}</span>
+          {/* Header Seksi */}
+          <div className="reveal text-center max-w-xl mx-auto mb-10">
+            <div className="eyebrow justify-center flex mb-3 text-gold">
+              Google Reviews
+            </div>
+            <h2 className="text-3xl md:text-4xl font-semibold text-paper">
+              What Our <span className="text-gold">Customers Say</span>
             </h2>
           </div>
-
-          {(() => {
-            const [activeIndex, setActiveIndex] = useState(0);
-            const dataGallery = Array.isArray(galleryImgs) ? galleryImgs : [];
-
-            const handlePrev = () => {
-              setActiveIndex((prev) => (prev === 0 ? dataGallery.length - 1 : prev - 1));
-            };
-
-            const handleNext = () => {
-              setActiveIndex((prev) => (prev === dataGallery.length - 1 ? 0 : prev + 1));
-            };
-
-            if (dataGallery.length === 0) {
-              return <p className="text-center text-paper/45">Belum ada foto gallery tersedia.</p>;
-            }
-
-            return (
-              <div className="relative flex items-center justify-center h-[340px] md:h-[420px] w-full max-w-4xl mx-auto px-12">
-                <button
-                  onClick={handlePrev}
-                  type="button"
-                  className="absolute left-0 z-30 p-2.5 rounded-full bg-paper/90 hover:bg-paper text-ink shadow-lg transition-all focus:outline-none"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M15 18l-6-6 6-6" />
-                  </svg>
-                </button>
-
-                <div className="relative w-full h-full flex items-center justify-center">
-                  {dataGallery.map((photo, index) => {
-                    let position = index - activeIndex;
-                    if (position < -1) position = position + dataGallery.length;
-                    if (position > 1) position = position - dataGallery.length;
-
-                    const isActive = position === 0;
-                    const isLeft = position === -1;
-                    const isRight = position === 1;
-
-                    if (!isActive && !isLeft && !isRight) return null;
-
-                    return (
-                      <div
-                        key={photo.id || index}
-                        className={`absolute w-[260px] md:w-[350px] aspect-square rounded-xl overflow-hidden border transition-all duration-500 ease-out frame-corners ${isActive
-                          ? 'z-20 scale-100 opacity-100 border-gold/50 shadow-2xl translate-x-0'
-                          : isLeft
-                            ? 'z-10 scale-85 opacity-30 border-paper/10 -translate-x-[45%] md:-translate-x-[55%]'
-                            : 'z-10 scale-85 opacity-30 border-paper/10 translate-x-[45%] md:translate-x-[55%]'
-                          }`}
-                        style={{ backdropFilter: isActive ? 'none' : 'blur(3px)' }}
-                      >
-                        <img
-                          src={photo.image}
-                          alt="Ambience"
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <button
-                  onClick={handleNext}
-                  type="button"
-                  className="absolute right-0 z-30 p-2.5 rounded-full bg-paper/90 hover:bg-paper text-ink shadow-lg transition-all focus:outline-none"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M9 18l6-6-6-6" />
-                  </svg>
-                </button>
-              </div>
-            );
-          })()}
+          {/* Container Widget Elfsight */}
+          <div className="min-h-[300px] flex items-center justify-center">
+            <ElfsightReviews />
+          </div>
         </div>
       </section>
+
       <div className="wave-divider bg-black/25" />
+
       <section className="py-24 md:py-32" id="visit">
         <div className="uc-wrap">
           <div className="reveal text-center max-w-xl mx-auto mb-14">
@@ -518,94 +548,131 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
         </div>
       </section>
 
-
       <div className="wave-divider bg-black/40" />
       <PageFooter content={content} wa={wa} />
     </div>
   );
 }
 
-function MenuPage({ content, categories, items, wa, scrolled, mobileOpen, setMobileOpen }) {
+function MenuPage({ content, items, wa, scrolled, mobileOpen, setMobileOpen }) {
   useReveal();
-  const [activeCat, setActiveCat] = useState(categories[0]?.id ?? null);
   const [posterLightbox, setPosterLightbox] = useState(null);
-  const shown = items.filter((it) => String(it.category_id || it.categoryId) === String(activeCat));
-  const activeCategory = categories.find((c) => String(c.id) === String(activeCat));
 
-  useEffect(() => {
-    if (!activeCat && categories[0]?.id) {
-      setActiveCat(categories[0].id);
-    }
-  }, [activeCat, categories]);
+  const dataItems = Array.isArray(items) ? items : [];
 
   return (
     <div className="min-h-screen bg-ink text-paper">
-      <TopNav scrolled={scrolled} content={content} wa={wa} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} showMenuLink={false} />
+      <TopNav
+        scrolled={scrolled}
+        content={content}
+        wa={wa}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+        showMenuLink={false}
+      />
       <span id="top" />
+
       <section className="pt-32 pb-20 md:pt-40 md:pb-24">
-        <div className="uc-wrap">
-          <div className="reveal text-center max-w-2xl mx-auto mb-10">
-            <div className="eyebrow justify-center flex mb-3">Full Menu</div>
+        <div className="uc-wrap max-w-6xl mx-auto px-4">
+          <div className="reveal text-center max-w-2xl mx-auto mb-12">
+            <div className="eyebrow justify-center flex mb-3">Our Menu</div>
             <h1 className="text-3xl md:text-4xl font-semibold">
               Browse the <span className="text-gold">Menu</span>
             </h1>
             <p className="text-paper/60 mt-4 leading-relaxed">
-              Explore the full selection from breakfast to cocktails, all in one place.
+              Jelajahi seluruh pilihan menu kami. Ketuk pada gambar untuk memperbesar detail poster.
             </p>
           </div>
 
-          <div className="reveal flex flex-wrap justify-center gap-3 mb-12">
-            {Array.isArray(categories) && categories.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setActiveCat(c.id)}
-                className={`menu-tab ${String(activeCat) === String(c.id) ? 'bg-gold text-ink border-gold' : 'border-paper/20 text-paper/70 hover:border-gold/50 hover:text-gold'}`}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {dataItems.length === 0 && (
+              <p className="text-paper/45 text-center py-12 col-span-full">
+                Belum ada menu yang tersedia saat ini.
+              </p>
+            )}
 
-          {activeCategory?.posterImage ? (
-            <div className="reveal max-w-xl mx-auto">
-              <button onClick={() => setPosterLightbox(activeCategory.posterImage)} className="block w-full rounded-lg overflow-hidden frame-corners border border-paper/10 hover:border-gold/50 transition-colors">
-                <img src={activeCategory.posterImage} alt={activeCategory.name} className="w-full h-auto" />
-              </button>
-              <p className="text-center text-paper/45 text-xs mt-3 tracking-wide uppercase">Ketuk gambar untuk memperbesar</p>
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {shown.length === 0 && (
-                <p className="text-paper/45 text-center py-8 col-span-full">No items in this category yet.</p>
-              )}
-              {shown.map((it) => (
-                <div className="rounded-lg overflow-hidden bg-paper/[0.04] border border-paper/10 hover:border-gold/50 transition-colors" key={it.id}>
+            {dataItems.map((it) => (
+              <div
+                key={it.id}
+                className="group relative flex flex-col justify-between rounded-2xl overflow-hidden bg-paper/[0.03] border border-paper/10 hover:border-gold/50 transition-all duration-300 shadow-xl hover:-translate-y-1"
+              >
+                <div
+                  className="relative w-full aspect-[4/5] overflow-hidden bg-black/40 cursor-pointer"
+                  onClick={() => setPosterLightbox(imgSrc(it.image))}
+                >
                   {it.image ? (
-                    <div className="aspect-[4/3] overflow-hidden frame-corners">
-                      <img src={imgSrc(it.image)} alt={it.name} loading="lazy" className="w-full h-full object-cover" />
-                    </div>
+                    <img
+                      src={imgSrc(it.image)}
+                      alt={it.name || 'Menu Poster'}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   ) : (
-                    <div className="aspect-[4/3] bg-gradient-to-br from-sage/20 to-black/30 flex items-center justify-center text-5xl">{emojiFor(it.name)}</div>
+                    <div className="w-full h-full bg-gradient-to-br from-sage/20 to-black/30 flex items-center justify-center text-6xl">
+                      {typeof emojiFor === 'function' ? emojiFor(it.name) : '🍽️'}
+                    </div>
                   )}
-                  <div className="p-5">
-                    <h3 className="font-serif font-semibold mb-1.5">{it.name}</h3>
-                    {it.description && <p className="text-sm text-paper/55 leading-relaxed">{it.description}</p>}
+
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
+                    <span className="px-4 py-2 rounded-full bg-gold/90 text-ink text-xs font-semibold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                      Perbesar Poster
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+
+                <div className="p-4 bg-paper/[0.02] border-t border-paper/10 flex items-center justify-between">
+                  <div className="pr-2 truncate">
+                    <p className="text-gold font-semibold text-sm">
+                      {it.price && typeof rupiah === 'function'
+                        ? rupiah(it.price)
+                        : it.name || 'Menu Item'}
+                    </p>
+                  </div>
+
+                  <a
+                    href={`https://wa.me/${wa}?text=Halo,%20saya%20mau%20pesan%20${encodeURIComponent(
+                      it.name || 'Menu'
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="shrink-0 px-4 py-1.5 bg-gold hover:bg-gold/80 text-ink rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Pesan Via WA
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-
-
       {posterLightbox && (
-        <div className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 md:p-10" onClick={() => setPosterLightbox(null)}>
-          <button onClick={() => setPosterLightbox(null)} aria-label="Tutup" className="absolute top-5 right-5 md:top-8 md:right-8 text-paper/80 hover:text-gold transition-colors">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+        <div
+          className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 md:p-10"
+          onClick={() => setPosterLightbox(null)}
+        >
+          <button
+            onClick={() => setPosterLightbox(null)}
+            aria-label="Tutup"
+            className="absolute top-5 right-5 md:top-8 md:right-8 text-paper/80 hover:text-gold transition-colors p-2"
+          >
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
           </button>
-          <img src={posterLightbox} alt="Menu" className="max-h-full max-w-full object-contain rounded-lg" onClick={(e) => e.stopPropagation()} />
+          <img
+            src={posterLightbox}
+            alt="Menu Detail"
+            className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
 
