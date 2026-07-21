@@ -120,71 +120,6 @@ function ElfsightReviews() {
       data-elfsight-app-lazy
     />
   );
-
-  return (
-    <>
-      <div className="grid md:grid-cols-[280px_1fr] gap-10 items-start">
-        {/* KIRI — ringkasan rating */}
-        <div className="reveal rounded-2xl border border-paper/10 bg-paper/[0.03] p-8 text-center md:text-left md:sticky md:top-28">
-          <div className="text-5xl font-bold text-gold mb-2">{state.rating?.toFixed(1) ?? '—'}</div>
-          <div className="flex gap-1 justify-center md:justify-start mb-3">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <Star key={n} size={20} className={n <= Math.round(state.rating || 0) ? 'fill-gold text-gold' : 'text-paper/20'} />
-            ))}
-          </div>
-          {state.total > 0 && (
-            <p className="text-paper/55 text-sm">Berdasarkan {state.total} ulasan asli pengunjung di Google</p>
-          )}
-        </div>
-
-        {/* KANAN — 3 ulasan terbaik */}
-        <div className="flex flex-col gap-5">
-          {state.reviews.length === 0 ? (
-            <p className="reveal text-paper/45">Belum ada ulasan yang tersedia.</p>
-          ) : (
-            state.reviews.map((r, i) => (
-              <div key={i} className="reveal rounded-2xl border border-paper/10 bg-paper/[0.03] p-6 hover:border-gold/40 transition-all duration-300">
-                <div className="flex items-center gap-3 mb-3">
-                  {r.profile_photo_url ? (
-                    <img src={r.profile_photo_url} alt={r.author_name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" referrerPolicy="no-referrer" />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gold/20 text-gold flex items-center justify-center font-semibold flex-shrink-0">
-                      {r.author_name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <div className="min-w-0">
-                    <div className="font-serif font-semibold text-sm truncate">{r.author_name}</div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-0.5">
-                        {[1, 2, 3, 4, 5].map((n) => (
-                          <Star key={n} size={12} className={n <= r.rating ? 'fill-gold text-gold' : 'text-paper/20'} />
-                        ))}
-                      </div>
-                      {r.relative_time_description && (
-                        <span className="text-xs text-paper/40 capitalize">· {r.relative_time_description}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <p className="text-sm text-paper/65 leading-relaxed">{r.text}</p>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      <div className="text-center mt-12">
-        <a
-          href={fallbackHref}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center justify-center rounded-full px-6 py-3 text-xs font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors"
-        >
-          Baca Semua Ulasan di Google Maps →
-        </a>
-      </div>
-    </>
-  );
 }
 
 function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink = true }) {
@@ -201,7 +136,7 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-ink/95 backdrop-blur shadow-lg py-3' : 'bg-gradient-to-b from-black/50 to-transparent py-6'}`}>
         <div className="uc-wrap flex items-center justify-between">
           <Link to="/" className="font-serif text-xl font-semibold flex items-center gap-3 text-paper">
-            <img src= {imgSrc(content.logo)} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+            <img src={imgSrc(content.logo)} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
             {content.brand}
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -296,7 +231,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
         <div className="absolute inset-0 bg-black/60" />
         <div className="absolute inset-0 opacity-[0.08] bg-seigaiha" style={{ backgroundSize: '56px 28px' }} />
 
-        <div className="relative uc-wrap max-w-2xl mx-auto pt-24 flex flex-col items-center">
+        <div className="relative uc-wrap max-w-2xl mx-auto pt-24 pb-36 flex flex-col items-center">
           <div className="eyebrow justify-center flex mb-4">{content.heroEyebrow}</div>
 
           <img
@@ -338,7 +273,6 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
             <a href={wa} className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold border border-paper/40 text-paper hover:bg-paper hover:text-ink transition-colors">Reserve via WhatsApp</a>
           </div>
         </div>
-
         <a href="#about" onClick={(e) => handleHashScroll(e, '#about')} aria-label="Scroll" className="absolute bottom-8 left-1/2 -translate-x-1/2 text-paper/60 animate-bounce">
           <ChevronDown size={26} />
         </a>
