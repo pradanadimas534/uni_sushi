@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { HashRouter, Routes, Route, Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Clock, ChevronDown, Star } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, ChevronDown, Star, Italic } from 'lucide-react';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
@@ -124,6 +124,8 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
     { label: 'Our Story', to: '#about' },
     { label: 'Menu', to: '/menu' },
     { label: 'Reviews', to: '#reviews' },
+    { label: 'FAQ', to: '#faq'},
+    { label: 'Gallery', to: '/gallery'},
     { label: 'Visit', to: '#visit' },
   ];
 
@@ -131,11 +133,14 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
     <>
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-ink/95 backdrop-blur shadow-lg py-3 2xl:py-5' : 'bg-gradient-to-b from-black/60 to-transparent py-5 2xl:py-8'}`}>
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <Link to="/" className="font-serif text-xl 2xl:text-3xl font-semibold flex items-center gap-3 text-paper shrink-0">
+          <Link to="/" className="font-lora text-xl 2xl:text-3xl font-semibold flex items-center gap-3 text-paper shrink-0">
             <img src={imgSrc(content.logo)} alt={content.brand} className="w-9 h-9 2xl:w-12 2xl:h-12 rounded-full object-cover shrink-0" />
             <span>{content.brand}</span>
           </Link>
-          <div className="hidden md:flex items-center gap-8 2xl:gap-12">
+          <div
+            className="hidden md:flex items-center gap-8 2xl:gap-12"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
             {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
               link.to.startsWith('#') ? (
                 <a key={link.to} href={link.to} onClick={(e) => handleHashScroll(e, link.to)} className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors">
@@ -145,7 +150,9 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
                 <Link key={link.to} to={link.to} className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors">{link.label}</Link>
               )
             ))}
-            <a href={wa} className="inline-flex items-center justify-center rounded-full px-5 py-2.5 2xl:px-8 2xl:py-3.5 text-xs 2xl:text-base font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shrink-0">Reserve</a>
+            <a href={wa} className="inline-flex items-center justify-center rounded-full px-5 py-2.5 2xl:px-8 2xl:py-3.5 text-xs 2xl:text-base font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shrink-0">
+              Reserve
+            </a>
           </div>
           <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="md:hidden p-2 text-paper focus:outline-none">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
@@ -209,9 +216,26 @@ function PageFooter({ content, wa }) {
   );
 }
 
+
 function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, setMobileOpen }) {
   useReveal();
 
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
+  // Helper scroll aman jika handleHashScroll tidak ada
+  const handleScroll = (e, targetId) => {
+    e.preventDefault();
+    if (typeof handleHashScroll === 'function') {
+      handleHashScroll(e, targetId);
+    } else {
+      const el = document.querySelector(targetId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   const heroImg = content.heroImage;
 
   return (
@@ -297,10 +321,15 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
             </div>
 
             <div className="reveal order-1 lg:order-2">
-              <div className="eyebrow mb-3 text-gold 2xl:text-base">
+              <div
+                className="eyebrow mb-3 text-gold 2xl:text-base tracking-widest uppercase font-medium"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
                 {content?.aboutEyebrow}
               </div>
-              <p className="text-paper/65 leading-relaxed whitespace-pre-line text-sm md:text-base 2xl:text-xl">
+              <p className="text-paper/65 leading-relaxed whitespace-pre-line text-sm md:text-base 2xl:text-xl"
+                style={{ fontFamily: "'Lora', serif", fontStyle: "italic" }}
+              >
                 {content?.aboutText}
               </p>
             </div>
@@ -314,13 +343,21 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <section className="py-20 md:py-28 2xl:py-36 bg-black/40 overflow-hidden" id="menu-highlight">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-4">
-            <div className="eyebrow justify-center flex mb-3 text-gold 2xl:text-base">Our Selection</div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold text-white">
-              Featured <span className="text-gold">Menu</span>
+            <div
+              className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
+              MOST ORDERED
+            </div>
+            <h2
+              className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-bold text-white"
+              style={{ fontFamily: "'Lora', serif" }}
+            >
+              Best Seller <span className="text-gold italic">Menu</span>
             </h2>
           </div>
           <p className="reveal text-center text-paper/55 text-sm 2xl:text-lg max-w-lg 2xl:max-w-2xl mx-auto mb-12 2xl:mb-16">
-            Explore our signature dishes crafted with fresh ingredients and authentic flavors.
+            Crowd-pleasing favorites made with bold flavors and fresh ingredients.
           </p>
 
           {(() => {
@@ -448,11 +485,16 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <section className="py-20 md:py-28 2xl:py-36 bg-black/25 overflow-hidden" id="reviews">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-10">
-            <div className="eyebrow justify-center flex mb-3 text-gold 2xl:text-base">
+            <div
+              className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
               Google Reviews
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold text-paper">
-              What Our <span className="text-gold">Customers Say</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold text-paper"
+              style={{ fontFamily: "'Lora', serif" }}
+            >
+              What Our <span className="text-gold italic">Customers Say</span>
             </h2>
           </div>
           <div className="min-h-[280px] flex items-center justify-center">
@@ -461,40 +503,101 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
         </div>
       </section>
 
+      <div className="wave-divider bg-black/25" />
+
+      {/* FAQ SECTION */}
+      <section className="py-16 md:py-24 bg-[#121212] text-paper" id="faq">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div
+            className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
+            Got Questions?
+          </div>
+
+          <h2
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-white mb-12"
+            style={{ fontFamily: "'Lora', serif" }}
+          >
+            Frequently Asked <span className="text-[#FF5722] italic">Questions</span>
+          </h2>
+
+          <div
+            className="space-y-4"
+            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+          >
+            {(data?.faqData || []).map((item, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div
+                  key={index}
+                  className="border border-white/10 rounded-xl overflow-hidden bg-white/5 transition-colors duration-200"
+                >
+                  <button
+                    onClick={() => toggleFAQ(index)}
+                    className="w-full flex items-center justify-between p-5 text-left text-base sm:text-lg font-medium text-paper hover:text-gold transition-colors focus:outline-none"
+                  >
+                    <span>{item.q}</span>
+                    <i
+                      className={`fa-solid fa-chevron-down ml-4 text-gold text-sm transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                    ></i>
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-5 pb-5 pt-1 text-sm sm:text-base text-paper/80 leading-relaxed border-t border-white/5">
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <div className="wave-divider bg-black/25" />
+
       {/* VISIT US SECTION */}
       <section className="py-20 md:py-28 2xl:py-36" id="visit">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-12">
-            <div className="eyebrow justify-center flex mb-3 2xl:text-base">Come Say Hi</div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold">Visit <span className="text-gold">Us</span></h2>
+            <div
+              className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
+              Come Say Hi
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold" style={{ fontFamily: "'Lora', serif" }}
+            >
+              Visit <span className="text-gold italic">Us</span></h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 2xl:gap-16 items-start">
             <div className="reveal space-y-6 2xl:space-y-8">
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><MapPin size={18} className="2xl:w-6 2xl:h-6" /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Location</div>
+                  <div className="font-Lora font-semibold mb-1 2xl:text-xl">Location</div>
                   <div className="text-sm 2xl:text-base text-paper/60">{content.address}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Phone size={18} className="2xl:w-6 2xl:h-6" /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Phone</div>
+                  <div className="font-Lora font-semibold mb-1 2xl:text-xl">Phone</div>
                   <div className="text-sm 2xl:text-base text-paper/60">{content.phone}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Mail size={18} className="2xl:w-6 2xl:h-6" /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Email</div>
+                  <div className="font-Lora font-semibold mb-1 2xl:text-xl">Email</div>
                   <div className="text-sm 2xl:text-base text-paper/60">{content.email}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Clock size={18} className="2xl:w-6 2xl:h-6" /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Opening Hours</div>
+                  <div className="font-Lora font-semibold mb-1 2xl:text-xl">Opening Hours</div>
                   {(content.hours || []).map((h, i) => {
                     const label = h.d || h.day || h.label || 'Hours';
                     const value = h.h || h.time || h.hours || '';

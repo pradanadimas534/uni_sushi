@@ -33,12 +33,13 @@ export const DEV_DATA = {
     { id: 8, name: 'Sandwich & Dessert' },
     { id: 9, name: 'Appetizer' },
     { id: 10, name: 'Supreme' },
-    { id: 11, name: 'Salad'}
+    { id: 11, name: 'Salad' },
+    { id: 12, name: 'Pizza Edition' }
   ],
   items: [
     { id: 1, name: 'Alvocado Coffee', image: '/images/avocado_coffee.jpg' },
     { id: 2, name: 'Bucket Bali Hai', image: '/images/bucket_bali_hai.jpg' },
-    { id: 3, name: 'Calsone Pizza', image: '/images/calsone_pizza.jpg' },
+    { id: 3, categories: 12, name: 'Calsone Pizza', image: '/images/calsone_pizza.jpg' },
     { id: 4, name: 'Chicken Habachi Grill', image: '/images/chiken_habachi_grill.jpg' },
     { id: 5, categories: 2, name: 'Chicken Teriyaki Roll', image: '/images/chiken_teriyaki_roll.jpg' },
     { id: 6, name: 'Chiraszi Deluxe Uni', image: '/images/chiraszi_deluxe_uni.jpg' },
@@ -48,7 +49,7 @@ export const DEV_DATA = {
     { id: 10, categories: 11, name: 'Kani Crab Salad', image: '/images/kani_crab_salad.jpg' },
     { id: 11, name: 'Karage Chicken', image: '/images/karage_chiken.jpg' },
     { id: 12, name: 'Manggo Daiquiri', image: '/images/manggo_daiquiri.jpg' },
-    { id: 13, name: 'Margarita Pizza', image: '/images/margarita_pizza.jpg' },
+    { id: 13, categories: 12, name: 'Margarita Pizza', image: '/images/margarita_pizza.jpg' },
     { id: 14, categories: 6, name: 'Mongolian Beef', image: '/images/mongolian_beef.jpg', isFeatured: true },
     { id: 15, name: 'Nasi Goreng Nusantara', image: '/images/nasi_goreng_nusantara.jpg', isFeatured: true },
     { id: 16, name: 'Pinacolada', image: '/images/pinacolada.jpg' },
@@ -59,10 +60,10 @@ export const DEV_DATA = {
     { id: 21, categories: 5, name: 'Tripel Monkey Burger', image: '/images/tripel_monkey_burger.jpg' },
     { id: 22, categories: 5, name: 'Ultimate Burger Uni', image: '/images/ultimate_burger_uni.jpg' },
     { id: 23, categories: 8, name: 'Uni Club Sandwich', image: '/images/uni_club_sandwich.jpg' },
-    { id: 24, name: 'Uni Spot Bar Pizza', image: '/images/uni_spot_bar_pizza.jpg' },
+    { id: 24, categories: 12, name: 'Uni Spot Bar Pizza', image: '/images/uni_spot_bar_pizza.jpg' },
     { id: 25, categories: 2, name: 'Sushi Lover', image: '/images/sushi_lover.jpg', isFeatured: true, },
     { id: 26, categories: 10, name: 'Salmon Mentai', image: '/images/salmon_mentai_roll.jpg', isFeatured: true },
-    { id: 27, name: 'Cosmic Colanda', image: '/images/cosmic_colanda.jpg'}
+    { id: 27, name: 'Cosmic Colanda', image: '/images/cosmic_colanda.jpg' }
   ],
   // gallery: [
   //   { id: 1, image: '/images/IMG_3696.jpg',},
@@ -76,7 +77,34 @@ export const DEV_DATA = {
   //   { id: 9, image: '/images/IMG_6712.jpg'}
   // ],
 
-  katalog: [
-
-  ],
+  faqData: [
+    {
+      q: "Where is Uni Sushi Bali located?",
+      a: "We're located on Jl. Benesari, Kuta, Kec. Kuta, Kabupaten Badung, Bali — an easy walk from the heart of Kuta."
+    },
+    {
+      q: "What are Uni Sushi's opening hours?",
+      a: "We're open daily from 11:00 AM to 12:00 AM (midnight), including weekends."
+    },
+    {
+      q: "What are Uni Sushi's signature menu items?",
+      a: "We serve a mix of sushi bar and Asian fusion dishes, with guest favorites including Caesar Salad, Chicken Cashewnuts, and Chicken Strip with Vegetable — all made with fresh ingredients and bold flavors."
+    },
+    {
+      q: "Does Uni Sushi offer delivery?",
+      a: "Yes, we deliver via GoFood and GrabFood, or you can order directly through WhatsApp."
+    },
+    {
+      q: "How can I contact or place an order?",
+      a: "You can reach us at 0813-3990-099, or simply order through the 'Order via WhatsApp' button on our website."
+    },
+    {
+      q: "Can I make a reservation?",
+      a: "Yes, just use the 'Reserve' button on our website to book a table in advance — especially recommended during peak hours."
+    },
+    {
+      q: "What's the average price range per person?",
+      a: "Expect to spend around Rp75,000–Rp100,000 per person, depending on your menu choices."
+    }
+  ]
 };
