@@ -623,7 +623,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
               <iframe
                 title="Location"
                 className="absolute inset-0 w-full h-full border-0"
-                src={`https://www.google.com/maps?q=${encodeURIComponent(content.address || content.mapsQuery || 'Kuta, Bali')}&output=embed`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent('UNI SUSHI ASIAN FUSION' || content.mapsQuery || content.address)}&output=embed`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
