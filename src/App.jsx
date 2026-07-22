@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { HashRouter, Routes, Route, Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Clock, ChevronDown, Star, Italic } from 'lucide-react';
+import { Link, Route, Routes, useLocation, useNavigate, HashRouter } from 'react-router-dom';
+
+import { MapPin, Phone, Mail, Clock, ChevronDown, Star, Image as ImageIcon } from 'lucide-react';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
@@ -9,6 +10,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
+
 const rupiah = (n) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
 
 // Nyalakan mode maintenance dengan set ke true.
@@ -16,13 +18,13 @@ const MAINTENANCE_MODE = false;
 
 function Maintenance({ content, wa }) {
   return (
-    <div className="min-h-screen bg-ink text-paper flex items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen bg-ink text-paper flex items-center justify-center px-6 relative overflow-hidden font-sans">
       <div className="absolute inset-0 opacity-[0.06] bg-seigaiha" style={{ backgroundSize: '56px 28px' }} />
       <div className="relative text-center max-w-lg 2xl:max-w-2xl w-full mx-auto">
         <img src={imgSrc(content.logo)} alt={content.brand || 'Uni Sushi'} className="w-20 h-20 2xl:w-28 2xl:h-28 rounded-full mx-auto mb-8 object-cover ring-1 ring-gold/40" />
-        <div className="eyebrow justify-center flex mb-4 2xl:text-base">Sedang Dalam Perbaikan</div>
-        <h1 className="text-3xl md:text-4xl 2xl:text-5xl font-semibold mb-5 leading-tight">
-          {content.brand || 'Uni Sushi'} <span className="text-gold">sedang berbenah</span>
+        <div className="eyebrow justify-center flex mb-4 2xl:text-base font-jp">Sedang Dalam Perbaikan</div>
+        <h1 className="text-3xl md:text-4xl 2xl:text-5xl font-semibold mb-5 leading-tight font-serif">
+          {content.brand || 'Uni Sushi'} <span className="text-gold italic">sedang berbenah</span>
         </h1>
         <p className="text-paper/60 leading-relaxed mb-10 text-sm md:text-base 2xl:text-lg">
           Kami sedang menata ulang halaman ini agar lebih baik. Silakan
@@ -118,7 +120,12 @@ function ElfsightReviews() {
   );
 }
 
+
+
 function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink = true }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const primaryLinks = [
     { label: 'Home', to: '#top' },
     { label: 'Our Story', to: '#about' },
@@ -129,46 +136,86 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
     { label: 'Visit', to: '#visit' },
   ];
 
+  // Handler pintar untuk meredirect & scroll ke anchor
+  const handleNavClick = (e, targetHash) => {
+    e.preventDefault();
+    
+    // Jika sedang di luar Home ('/'), berpindah ke Home dulu + hash
+    if (location.pathname !== '/') {
+      navigate(`/${targetHash}`);
+      return;
+    }
+
+    // Jika sudah di Home, scroll ke element id
+    if (typeof handleHashScroll === 'function') {
+      handleHashScroll(e, targetHash);
+    } else {
+      const element = document.querySelector(targetHash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
     <>
-      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-ink/95 backdrop-blur shadow-lg py-3 2xl:py-5' : 'bg-gradient-to-b from-black/60 to-transparent py-5 2xl:py-8'}`}>
+      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 font-jp ${scrolled ? 'bg-ink/95 backdrop-blur shadow-lg py-3 2xl:py-5' : 'bg-gradient-to-b from-black/60 to-transparent py-5 2xl:py-8'}`}>
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <Link to="/" className="font-lora text-xl 2xl:text-3xl font-semibold flex items-center gap-3 text-paper shrink-0">
+          <Link to="/" className="font-serif text-xl 2xl:text-3xl font-semibold flex items-center gap-3 text-paper shrink-0">
             <img src={imgSrc(content.logo)} alt={content.brand} className="w-9 h-9 2xl:w-12 2xl:h-12 rounded-full object-cover shrink-0" />
             <span>{content.brand}</span>
           </Link>
-          <div
-            className="hidden md:flex items-center gap-8 2xl:gap-12"
-            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-          >
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-8 2xl:gap-12 font-jp">
             {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
               link.to.startsWith('#') ? (
-                <a key={link.to} href={link.to} onClick={(e) => handleHashScroll(e, link.to)} className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors">
+                <a 
+                  key={link.to} 
+                  href={`/${link.to}`} 
+                  onClick={(e) => handleNavClick(e, link.to)} 
+                  className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors"
+                >
                   {link.label}
                 </a>
               ) : (
-                <Link key={link.to} to={link.to} className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors">{link.label}</Link>
+                <Link key={link.to} to={link.to} className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors">
+                  {link.label}
+                </Link>
               )
             ))}
             <a href={wa} className="inline-flex items-center justify-center rounded-full px-5 py-2.5 2xl:px-8 2xl:py-3.5 text-xs 2xl:text-base font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shrink-0">
               Reserve
             </a>
           </div>
+
+          {/* Mobile Hamburger Button */}
           <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="md:hidden p-2 text-paper focus:outline-none">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
           </button>
         </div>
       </nav>
 
-      <div className={`fixed inset-0 z-[60] bg-ink text-paper flex flex-col items-center justify-center gap-8 transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      {/* Mobile Drawer Navigation */}
+      <div className={`fixed inset-0 z-[60] bg-ink text-paper flex flex-col items-center justify-center gap-8 transition-transform duration-300 font-jp ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <button aria-label="Close" onClick={() => setMobileOpen(false)} className="absolute top-6 right-6 text-3xl font-light">×</button>
         {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
           link.to.startsWith('#') ? (
-            <a key={link.to} href={link.to} onClick={(e) => { setMobileOpen(false); handleHashScroll(e, link.to); }} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">
+            <a 
+              key={link.to} 
+              href={`/${link.to}`} 
+              onClick={(e) => { 
+                setMobileOpen(false); 
+                handleNavClick(e, link.to); 
+              }} 
+              className="text-[clamp(1.25rem,4vw,2rem)] font-serif"
+            >
               {link.label}
             </a>
           ) : (
-            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">{link.label}</Link>
+            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">
+              {link.label}
+            </Link>
           )
         ))}
         <a href={wa} onClick={() => setMobileOpen(false)} className="inline-flex items-center justify-center rounded-full px-6 py-3 text-[clamp(0.85rem,1.1vw,1.125rem)] font-semibold bg-gold text-ink mt-4">Reserve →</a>
@@ -179,7 +226,7 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
 
 function PageFooter({ content, wa }) {
   return (
-    <footer className="bg-black/40 border-t border-paper/10 pt-16 pb-8 2xl:pt-24 2xl:pb-12">
+    <footer className="bg-black/40 border-t border-paper/10 pt-16 pb-8 2xl:pt-24 2xl:pb-12 font-jp">
       <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 2xl:gap-16 mb-12">
           <div>
@@ -194,7 +241,7 @@ function PageFooter({ content, wa }) {
             <div className="flex flex-col gap-2 2xl:gap-3">
               <Link to="/" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Home</Link>
               <Link to="/menu" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Menu</Link>
-              <a href="#katalog" onClick={(e) => handleHashScroll(e, '#katalog')} className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Catalog</a>
+              <Link to="/gallery" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Gallery</Link>
               <a href="#reviews" onClick={(e) => handleHashScroll(e, '#reviews')} className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Reviews</a>
             </div>
           </div>
@@ -216,7 +263,6 @@ function PageFooter({ content, wa }) {
   );
 }
 
-
 function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, setMobileOpen }) {
   useReveal();
 
@@ -226,24 +272,14 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
     setOpenFaqIndex(openFaqIndex === index ? null : index);
   };
 
-  // Helper scroll aman jika handleHashScroll tidak ada
-  const handleScroll = (e, targetId) => {
-    e.preventDefault();
-    if (typeof handleHashScroll === 'function') {
-      handleHashScroll(e, targetId);
-    } else {
-      const el = document.querySelector(targetId);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
   const heroImg = content.heroImage;
 
   return (
-    <div className="min-h-screen bg-ink text-paper overflow-x-hidden">
+    <div className="min-h-screen bg-ink text-paper overflow-x-hidden font-jp">
       <TopNav scrolled={scrolled} content={content} wa={wa} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <span id="top" />
 
-      {/* HERO SECTION DENGAN BATAS TINGGI MAX PADA ULTRA-WIDE */}
+      {/* HERO SECTION */}
       <header className="relative min-h-screen max-h-[1200px] 2xl:max-h-[1400px] flex items-center justify-center text-center overflow-hidden px-4">
         {heroImg ? (
           <img src={imgSrc(heroImg)} alt={content.brand} className="absolute inset-0 w-full h-full object-cover" />
@@ -254,22 +290,26 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
         <div className="absolute inset-0 opacity-[0.08] bg-seigaiha" style={{ backgroundSize: '56px 28px' }} />
 
         <div className="relative max-w-3xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto pt-24 pb-32 2xl:pt-36 2xl:pb-40 flex flex-col items-center">
-          <div className="eyebrow justify-center flex mb-4 2xl:text-base">{content.heroEyebrow}</div>
+          <div className="eyebrow justify-center flex mb-4 2xl:text-base font-jp">{content.heroEyebrow}</div>
 
           <img
             src={imgSrc(content.logo)}
             alt={`${content.brand} Logo`}
-            className="w-24 sm:w-28 md:w-32 2xl:w-44 3xl:w-52 aspect-square rounded-full object-cover border-4 border-white/20 shadow-2xl mb-4 shrink-0"
+            className="w-24 sm:w-28 md:w-32 2xl:w-44 3xl:w-52 aspect-square rounded-full object-cover border-4 border-white/20 shadow-2xl mb-1 sm:mb-2 shrink-0"
           />
 
           <div className="flex flex-col items-center my-2 select-none w-full">
+            {/* 2. Tambahkan margin atas negatif (-mt-2 sm:-mt-4) agar teks uni tertarik ke atas mendekati logo */}
             <span
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl 2xl:text-[9rem] 3xl:text-[11rem] text-[#FF5722] leading-none drop-shadow-md -mb-2 md:-mb-3 2xl:-mb-6 z-10"
-              style={{ fontFamily: "'Caveat', cursive", fontWeight: 700 }}
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl 2xl:text-[9rem] 3xl:text-[11rem] text-[#FF5722] leading-none drop-shadow-md -mt-2 sm:-mt-4 -mb-2 md:-mb-3 2xl:-mb-6 z-10 italic inline-flex items-baseline"
+              style={{ fontFamily: "'Lora', serif", fontWeight: 600 }}
             >
-              Uni
-            </span>
+              {/* Huruf u */}
+              <span className="text-[1.35em] leading-none">u</span>
 
+              {/* Huruf ni */}
+              <span>ni</span>
+            </span>
             <span
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2xl:text-[6.5rem] 3xl:text-[8rem] text-white uppercase tracking-wider leading-none drop-shadow-xl"
               style={{ fontFamily: "'Permanent Marker', cursive" }}
@@ -321,15 +361,10 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
             </div>
 
             <div className="reveal order-1 lg:order-2">
-              <div
-                className="eyebrow mb-3 text-gold 2xl:text-base tracking-widest uppercase font-medium"
-                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-              >
+              <div className="eyebrow mb-3 text-gold 2xl:text-base tracking-widest uppercase font-medium font-jp">
                 {content?.aboutEyebrow}
               </div>
-              <p className="text-paper/65 leading-relaxed whitespace-pre-line text-sm md:text-base 2xl:text-xl"
-                style={{ fontFamily: "'Lora', serif", fontStyle: "italic" }}
-              >
+              <p className="text-paper/65 leading-relaxed whitespace-pre-line text-sm md:text-base 2xl:text-xl font-serif italic">
                 {content?.aboutText}
               </p>
             </div>
@@ -343,16 +378,10 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <section className="py-20 md:py-28 2xl:py-36 bg-black/40 overflow-hidden" id="menu-highlight">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-4">
-            <div
-              className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase"
-              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-            >
+            <div className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase font-jp">
               MOST ORDERED
             </div>
-            <h2
-              className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-bold text-white"
-              style={{ fontFamily: "'Lora', serif" }}
-            >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-bold text-white font-serif">
               Best Seller <span className="text-gold italic">Menu</span>
             </h2>
           </div>
@@ -421,12 +450,12 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
                                 </div>
                               )}
 
-                              <span className="absolute top-3 right-3 bg-gold text-ink text-[10px] 2xl:text-xs font-bold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full shadow-lg border border-paper/20 uppercase tracking-wider">
+                              <span className="absolute top-3 right-3 bg-gold text-ink text-[10px] 2xl:text-xs font-bold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full shadow-lg border border-paper/20 uppercase tracking-wider font-jp">
                                 ★ Best Seller
                               </span>
 
                               {it.category && (
-                                <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-gold text-[10px] 2xl:text-xs font-semibold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full border border-gold/20">
+                                <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-gold text-[10px] 2xl:text-xs font-semibold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full border border-gold/20 font-jp">
                                   {it.category}
                                 </span>
                               )}
@@ -435,17 +464,17 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
                             <div className="p-5 2xl:p-7 flex-1 flex flex-col justify-between bg-black/30">
                               <div>
                                 <div className="flex justify-between items-start gap-2 mb-2">
-                                  <h3 className="font-semibold text-base 2xl:text-xl text-white group-hover:text-gold transition-colors line-clamp-1">
+                                  <h3 className="font-semibold text-base 2xl:text-xl text-white group-hover:text-gold transition-colors line-clamp-1 font-serif">
                                     {it.name || 'Nama Menu'}
                                   </h3>
                                   {it.price && (
-                                    <span className="text-gold font-bold text-sm 2xl:text-lg whitespace-nowrap">
+                                    <span className="text-gold font-bold text-sm 2xl:text-lg whitespace-nowrap font-jp">
                                       {typeof it.price === 'number' ? `Rp ${it.price.toLocaleString('id-ID')}` : it.price}
                                     </span>
                                   )}
                                 </div>
                                 {it.description && (
-                                  <p className="text-paper/60 text-xs 2xl:text-sm line-clamp-2 mb-4">
+                                  <p className="text-paper/60 text-xs 2xl:text-sm line-clamp-2 mb-4 font-jp">
                                     {it.description}
                                   </p>
                                 )}
@@ -455,9 +484,9 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
                                 href={itemWa}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full py-2.5 2xl:py-3.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs 2xl:text-sm transition-all text-center block mt-2"
+                                className="w-full py-2.5 2xl:py-3.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs 2xl:text-sm transition-all text-center block mt-2 font-jp"
                               >
-                                Pesan via WhatsApp
+                                Reserve via WhatsApp
                               </a>
                             </div>
                           </div>
@@ -469,7 +498,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
 
                 <Link
                   to="/menu"
-                  className="inline-flex items-center justify-center rounded-full px-8 py-3.5 2xl:px-12 2xl:py-4.5 text-sm 2xl:text-base font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center rounded-full px-8 py-3.5 2xl:px-12 2xl:py-4.5 text-sm 2xl:text-base font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg font-jp"
                 >
                   See Full Menu
                 </Link>
@@ -485,15 +514,10 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <section className="py-20 md:py-28 2xl:py-36 bg-black/25 overflow-hidden" id="reviews">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-10">
-            <div
-              className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase"
-              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-            >
+            <div className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase font-jp">
               Google Reviews
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold text-paper"
-              style={{ fontFamily: "'Lora', serif" }}
-            >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold text-paper font-serif">
               What Our <span className="text-gold italic">Customers Say</span>
             </h2>
           </div>
@@ -506,26 +530,17 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <div className="wave-divider bg-black/25" />
 
       {/* FAQ SECTION */}
-      <section className="py-16 md:py-24 bg-[#121212] text-paper" id="faq">
+      <section className="py-16 md:py-24 bg-[#121212] text-paper font-jp" id="faq">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase"
-            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-          >
+          <div className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase">
             Got Questions?
           </div>
 
-          <h2
-            className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-white mb-12"
-            style={{ fontFamily: "'Lora', serif" }}
-          >
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-white mb-12 font-serif">
             Frequently Asked <span className="text-[#FF5722] italic">Questions</span>
           </h2>
 
-          <div
-            className="space-y-4"
-            style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-          >
+          <div className="space-y-4">
             {(data?.faqData || []).map((item, index) => {
               const isOpen = openFaqIndex === index;
               return (
@@ -538,9 +553,7 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
                     className="w-full flex items-center justify-between p-5 text-left text-base sm:text-lg font-medium text-paper hover:text-gold transition-colors focus:outline-none"
                   >
                     <span>{item.q}</span>
-                    <i
-                      className={`fa-solid fa-chevron-down ml-4 text-gold text-sm transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                    ></i>
+                    <ChevronDown className={`ml-4 text-gold text-sm transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {isOpen && (
@@ -558,46 +571,43 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <div className="wave-divider bg-black/25" />
 
       {/* VISIT US SECTION */}
-      <section className="py-20 md:py-28 2xl:py-36" id="visit">
+      <section className="py-20 md:py-28 2xl:py-36 font-jp" id="visit">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-12">
-            <div
-              className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase"
-              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
-            >
+            <div className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase">
               Come Say Hi
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold" style={{ fontFamily: "'Lora', serif" }}
-            >
-              Visit <span className="text-gold italic">Us</span></h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold font-serif">
+              Visit <span className="text-gold italic">Us</span>
+            </h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 2xl:gap-16 items-start">
             <div className="reveal space-y-6 2xl:space-y-8">
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><MapPin size={18} className="2xl:w-6 2xl:h-6" /></div>
                 <div>
-                  <div className="font-Lora font-semibold mb-1 2xl:text-xl">Location</div>
+                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Location</div>
                   <div className="text-sm 2xl:text-base text-paper/60">{content.address}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Phone size={18} className="2xl:w-6 2xl:h-6" /></div>
                 <div>
-                  <div className="font-Lora font-semibold mb-1 2xl:text-xl">Phone</div>
+                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Phone</div>
                   <div className="text-sm 2xl:text-base text-paper/60">{content.phone}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Mail size={18} className="2xl:w-6 2xl:h-6" /></div>
                 <div>
-                  <div className="font-Lora font-semibold mb-1 2xl:text-xl">Email</div>
+                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Email</div>
                   <div className="text-sm 2xl:text-base text-paper/60">{content.email}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Clock size={18} className="2xl:w-6 2xl:h-6" /></div>
                 <div>
-                  <div className="font-Lora font-semibold mb-1 2xl:text-xl">Opening Hours</div>
+                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Opening Hours</div>
                   {(content.hours || []).map((h, i) => {
                     const label = h.d || h.day || h.label || 'Hours';
                     const value = h.h || h.time || h.hours || '';
@@ -665,7 +675,7 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
   };
 
   return (
-    <div className="min-h-screen bg-ink text-paper overflow-x-hidden">
+    <div className="min-h-screen bg-ink text-paper overflow-x-hidden font-jp">
       <TopNav
         scrolled={scrolled}
         content={content}
@@ -679,12 +689,13 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
       <section className="pt-32 pb-20 md:pt-40 md:pb-24 2xl:pt-48 2xl:pb-36">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-2xl 2xl:max-w-4xl mx-auto mb-10 2xl:mb-16">
-            <div className="eyebrow justify-center flex mb-3 2xl:text-base">Our Menu</div>
-            <h1 className="text-3xl md:text-4xl 2xl:text-5xl font-semibold">
-              Browse the <span className="text-gold">Menu</span>
+            <div className="eyebrow justify-center flex mb-3 2xl:text-base font-jp">Our Menu</div>
+            <h1 className="text-3xl md:text-4xl 2xl:text-5xl font-semibold font-serif">
+              Browse the <span className="text-gold italic">Menu</span>
             </h1>
-            <p className="text-paper/60 mt-4 text-sm md:text-base 2xl:text-xl leading-relaxed">
-              Explore our full menu selection. Select a category below to filter your favorite dishes.            </p>
+            <p className="text-paper/60 mt-4 text-sm md:text-base 2xl:text-xl leading-relaxed font-jp">
+              Explore our full menu selection. Select a category below to filter your favorite dishes.
+            </p>
           </div>
 
           {/* TAB BAR FILTER KATEGORI */}
@@ -692,14 +703,14 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
             <button
               onClick={() => scroll('left')}
               aria-label="Scroll left"
-              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 2xl:w-12 2xl:h-12 items-center justify-center rounded-full bg-gold/90 text-ink hover:bg-gold shadow-md transition-transform hover:scale-110 2xl:text-xl"
+              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 2xl:w-12 2xl:h-12 items-center justify-center rounded-full bg-gold/90 text-ink hover:bg-gold shadow-md transition-transform hover:scale-110 2xl:text-xl font-bold"
             >
               ‹
             </button>
 
             <div
               ref={scrollRef}
-              className="flex items-center gap-2 2xl:gap-4 overflow-x-auto py-2 px-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden scroll-smooth"
+              className="flex items-center gap-2 2xl:gap-4 overflow-x-auto py-2 px-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden scroll-smooth font-jp"
             >
               {categoriesList.map((cat) => {
                 const isActive = selectedCategory === cat.id;
@@ -721,7 +732,7 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
             <button
               onClick={() => scroll('right')}
               aria-label="Scroll right"
-              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 2xl:w-12 2xl:h-12 items-center justify-center rounded-full bg-gold/90 text-ink hover:bg-gold shadow-md transition-transform hover:scale-110 2xl:text-xl"
+              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 2xl:w-12 2xl:h-12 items-center justify-center rounded-full bg-gold/90 text-ink hover:bg-gold shadow-md transition-transform hover:scale-110 2xl:text-xl font-bold"
             >
               ›
             </button>
@@ -731,7 +742,7 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8 2xl:gap-10">
             {filteredItems.length === 0 && (
               <div className="text-center py-16 col-span-full bg-paper/[0.02] border border-paper/10 rounded-2xl">
-                <p className="text-paper/45 text-base 2xl:text-xl">
+                <p className="text-paper/45 text-base 2xl:text-xl font-jp">
                   Belum ada menu yang tersedia untuk kategori ini.
                 </p>
               </div>
@@ -749,7 +760,6 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
                   key={it.id || index}
                   className="group relative flex flex-col justify-between rounded-2xl overflow-hidden bg-paper/[0.03] border border-paper/10 hover:border-gold/50 transition-all duration-300 shadow-xl h-full"
                 >
-                  {/* Gambar / Emoji & Badge Header */}
                   <div className="relative w-full aspect-[4/3] sm:aspect-[4/5] overflow-hidden bg-black/40">
                     {it.image || it.img ? (
                       <img
@@ -767,36 +777,33 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
                       </div>
                     )}
 
-                    {/* Badge Best Seller (jika sesuai kondisi) */}
                     {isBestSeller && (
-                      <span className="absolute top-3 right-3 bg-gold text-ink text-[10px] 2xl:text-xs font-bold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full shadow-lg border border-paper/20 uppercase tracking-wider">
+                      <span className="absolute top-3 right-3 bg-gold text-ink text-[10px] 2xl:text-xs font-bold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full shadow-lg border border-paper/20 uppercase tracking-wider font-jp">
                         ★ Best Seller
                       </span>
                     )}
 
-                    {/* Badge Kategori */}
                     {(it.category || it.category_name) && (
-                      <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-gold text-[10px] 2xl:text-xs font-semibold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full border border-gold/20">
+                      <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-gold text-[10px] 2xl:text-xs font-semibold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full border border-gold/20 font-jp">
                         {it.category || it.category_name}
                       </span>
                     )}
                   </div>
 
-                  {/* Info Detail & Tombol Pesan */}
                   <div className="p-5 2xl:p-7 flex-1 flex flex-col justify-between bg-black/30">
                     <div>
                       <div className="flex justify-between items-start gap-2 mb-2">
-                        <h3 className="font-semibold text-base 2xl:text-xl text-white group-hover:text-gold transition-colors line-clamp-1">
+                        <h3 className="font-semibold text-base 2xl:text-xl text-white group-hover:text-gold transition-colors line-clamp-1 font-serif">
                           {it.name || 'Nama Menu'}
                         </h3>
                         {it.price && (
-                          <span className="text-gold font-bold text-sm 2xl:text-lg whitespace-nowrap">
+                          <span className="text-gold font-bold text-sm 2xl:text-lg whitespace-nowrap font-jp">
                             {typeof it.price === 'number' ? `Rp ${it.price.toLocaleString('id-ID')}` : it.price}
                           </span>
                         )}
                       </div>
                       {it.description && (
-                        <p className="text-paper/60 text-xs 2xl:text-sm line-clamp-2 mb-4">
+                        <p className="text-paper/60 text-xs 2xl:text-sm line-clamp-2 mb-4 font-jp">
                           {it.description}
                         </p>
                       )}
@@ -806,9 +813,9 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
                       href={itemWa}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-2.5 2xl:py-3.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs 2xl:text-sm transition-all text-center block mt-2"
+                      className="w-full py-2.5 2xl:py-3.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs 2xl:text-sm transition-all text-center block mt-2 font-jp"
                     >
-                      Pesan via WhatsApp
+                      Book Now
                     </a>
                   </div>
                 </div>
@@ -823,7 +830,70 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
   );
 }
 
-export { Maintenance, HomePage, MenuPage, TopNav, PageFooter };
+function GalleryPage({ content, katalog, wa, scrolled, mobileOpen, setMobileOpen }) {
+  useReveal();
+  const galleryList = Array.isArray(katalog) ? katalog : [];
+
+  return (
+    <div className="min-h-screen bg-ink text-paper overflow-x-hidden font-jp">
+      <TopNav
+        scrolled={scrolled}
+        content={content}
+        wa={wa}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
+      <span id="top" />
+
+      <section className="pt-32 pb-20 md:pt-40 md:pb-24 2xl:pt-48 2xl:pb-36">
+        <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="reveal text-center max-w-2xl 2xl:max-w-4xl mx-auto mb-12 2xl:mb-16">
+            <div className="eyebrow justify-center flex mb-3 2xl:text-base font-jp">Moments & Vibe</div>
+            <h1 className="text-3xl md:text-4xl 2xl:text-5xl font-semibold font-serif">
+              Our <span className="text-gold italic">Gallery</span>
+            </h1>
+            <p className="text-paper/60 mt-4 text-sm md:text-base 2xl:text-xl leading-relaxed font-jp">
+              A glimpse into the authentic dining atmosphere and delicious creations at Uni Sushi.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {galleryList.length === 0 ? (
+              <div className="text-center py-16 col-span-full bg-paper/[0.02] border border-paper/10 rounded-2xl">
+                <p className="text-paper/45 text-base 2xl:text-xl font-jp">
+                  Belum ada galeri foto saat ini.
+                </p>
+              </div>
+            ) : (
+              galleryList.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="group relative overflow-hidden rounded-2xl bg-black/40 border border-paper/10 aspect-square shadow-lg"
+                >
+                  <img
+                    src={imgSrc(item.image || item.img || item)}
+                    alt={item.title || `Gallery image ${idx + 1}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    {item.title && <h3 className="text-white font-serif font-semibold text-lg">{item.title}</h3>}
+                    {item.caption && <p className="text-paper/70 text-xs font-jp">{item.caption}</p>}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      <PageFooter content={content} wa={wa} />
+    </div>
+  );
+}
+
+export { Maintenance, HomePage, MenuPage, GalleryPage, TopNav, PageFooter };
+
 export default function App({ data }) {
   const content = data?.content || {};
   const categories = data?.categories || [];
@@ -850,11 +920,24 @@ export default function App({ data }) {
   }
 
   return (
-    <HashRouter>
-      <Routes>
-        <Route path="/menu" element={<MenuPage content={content} categories={categories} items={items} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
-        <Route path="*" element={<HomePage content={content} items={items} katalog={katalog} data={data} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
-      </Routes>
-    </HashRouter>
+    <>
+      {/* Pengaturan CSS Font Global */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Lora:ital,wght@0,400..700;1,400..700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Permanent+Marker&display=swap');
+
+        .font-jp { fontFamily: 'Noto Sans JP', sans-serif; }
+        .font-serif { fontFamily: 'Lora', serif; }
+        .font-caveat { fontFamily: 'Caveat', cursive; }
+        .font-marker { fontFamily: 'Permanent Marker', cursive; }
+      `}</style>
+
+      <HashRouter>
+        <Routes>
+          <Route path="/menu" element={<MenuPage content={content} categories={categories} items={items} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
+          <Route path="/gallery" element={<GalleryPage content={content} katalog={katalog} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
+          <Route path="*" element={<HomePage content={content} items={items} katalog={katalog} data={data} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
+        </Routes>
+      </HashRouter>
+    </>
   );
 }
