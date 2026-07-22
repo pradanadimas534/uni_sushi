@@ -256,7 +256,6 @@ function PageFooter({ content, wa }) {
         </div>
         <div className="border-t border-paper/10 pt-6 flex flex-wrap items-center justify-between gap-3 text-xs 2xl:text-sm text-paper/45">
           <span>© {new Date().getFullYear()} {content.brand} · Kuta, Bali</span>
-          <a href="/admin/" className="hover:text-gold transition-colors">Admin Login →</a>
         </div>
       </div>
     </footer>
