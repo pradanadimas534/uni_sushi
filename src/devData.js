@@ -61,7 +61,8 @@ export const DEV_DATA = {
     { id: 23, categories: 8, name: 'Uni Club Sandwich', image: '/images/uni_club_sandwich.jpg' },
     { id: 24, name: 'Uni Spot Bar Pizza', image: '/images/uni_spot_bar_pizza.jpg' },
     { id: 25, categories: 2, name: 'Sushi Lover', image: '/images/sushi_lover.jpg', isFeatured: true, },
-    { id: 26, categories: 10, name: 'Salmon Mentai', image: '/images/salmon_mentai_roll.jpg', isFeatured: true }
+    { id: 26, categories: 10, name: 'Salmon Mentai', image: '/images/salmon_mentai_roll.jpg', isFeatured: true },
+    { id: 27, name: 'Cosmic Colanda', image: '/images/cosmic_colanda.jpg'}
   ],
   // gallery: [
   //   { id: 1, image: '/images/IMG_3696.jpg',},
