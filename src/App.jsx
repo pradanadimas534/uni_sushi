@@ -121,32 +121,32 @@ function ElfsightReviews() {
 }
 
 
-
-function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink = true }) {
+function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // 1. Cek apakah pengguna berada di Homepage ('/')
+  const isHome = location.pathname === '/';
+
+  // 2. Jika di Home, arahkan 'Menu' ke '#best-seller'. Jika di luar Home, arahkan ke '/menu'
   const primaryLinks = [
     { label: 'Home', to: '#top' },
     { label: 'Our Story', to: '#about' },
-    { label: 'Menu', to: '/menu' },
+    { label: 'Menu', to: isHome ? '#menu-highlight' : '/menu' }, // <-- PENYESUAIAN DI SINI
     { label: 'Reviews', to: '#reviews' },
     { label: 'FAQ', to: '#faq' },
     { label: 'Gallery', to: '/gallery' },
     { label: 'Visit', to: '#visit' },
   ];
 
-  // Handler pintar untuk meredirect & scroll ke anchor
   const handleNavClick = (e, targetHash) => {
     e.preventDefault();
     
-    // Jika sedang di luar Home ('/'), berpindah ke Home dulu + hash
-    if (location.pathname !== '/') {
+    if (!isHome) {
       navigate(`/${targetHash}`);
       return;
     }
 
-    // Jika sudah di Home, scroll ke element id
     if (typeof handleHashScroll === 'function') {
       handleHashScroll(e, targetHash);
     } else {
@@ -168,10 +168,10 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8 2xl:gap-12 font-jp">
-            {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
+            {primaryLinks.map((link) => (
               link.to.startsWith('#') ? (
                 <a 
-                  key={link.to} 
+                  key={link.label} 
                   href={`/${link.to}`} 
                   onClick={(e) => handleNavClick(e, link.to)} 
                   className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors"
@@ -179,7 +179,7 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
                   {link.label}
                 </a>
               ) : (
-                <Link key={link.to} to={link.to} className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors">
+                <Link key={link.label} to={link.to} className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors">
                   {link.label}
                 </Link>
               )
@@ -199,10 +199,10 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
       {/* Mobile Drawer Navigation */}
       <div className={`fixed inset-0 z-[60] bg-ink text-paper flex flex-col items-center justify-center gap-8 transition-transform duration-300 font-jp ${mobileOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <button aria-label="Close" onClick={() => setMobileOpen(false)} className="absolute top-6 right-6 text-3xl font-light">×</button>
-        {primaryLinks.filter((link) => showMenuLink || link.label !== 'Menu').map((link) => (
+        {primaryLinks.map((link) => (
           link.to.startsWith('#') ? (
             <a 
-              key={link.to} 
+              key={link.label} 
               href={`/${link.to}`} 
               onClick={(e) => { 
                 setMobileOpen(false); 
@@ -213,7 +213,7 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
               {link.label}
             </a>
           ) : (
-            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">
+            <Link key={link.label} to={link.to} onClick={() => setMobileOpen(false)} className="text-[clamp(1.25rem,4vw,2rem)] font-serif">
               {link.label}
             </Link>
           )
@@ -742,7 +742,7 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
             {filteredItems.length === 0 && (
               <div className="text-center py-16 col-span-full bg-paper/[0.02] border border-paper/10 rounded-2xl">
                 <p className="text-paper/45 text-base 2xl:text-xl font-jp">
-                  Belum ada menu yang tersedia untuk kategori ini.
+                  There are no menus available for this category yet.
                 </p>
               </div>
             )}
@@ -860,7 +860,7 @@ function GalleryPage({ content, katalog, wa, scrolled, mobileOpen, setMobileOpen
             {galleryList.length === 0 ? (
               <div className="text-center py-16 col-span-full bg-paper/[0.02] border border-paper/10 rounded-2xl">
                 <p className="text-paper/45 text-base 2xl:text-xl font-jp">
-                  Belum ada galeri foto saat ini.
+                  There are no photo galleries at this time.
                 </p>
               </div>
             ) : (
