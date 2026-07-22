@@ -124,8 +124,8 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen, showMenuLink
     { label: 'Our Story', to: '#about' },
     { label: 'Menu', to: '/menu' },
     { label: 'Reviews', to: '#reviews' },
-    { label: 'FAQ', to: '#faq'},
-    { label: 'Gallery', to: '/gallery'},
+    { label: 'FAQ', to: '#faq' },
+    { label: 'Gallery', to: '/gallery' },
     { label: 'Visit', to: '#visit' },
   ];
 
@@ -684,8 +684,7 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
               Browse the <span className="text-gold">Menu</span>
             </h1>
             <p className="text-paper/60 mt-4 text-sm md:text-base 2xl:text-xl leading-relaxed">
-              Jelajahi seluruh pilihan menu kami. Pilih kategori di bawah ini untuk memfilter sajian favorit Anda.
-            </p>
+              Explore our full menu selection. Select a category below to filter your favorite dishes.            </p>
           </div>
 
           {/* TAB BAR FILTER KATEGORI */}
