@@ -141,7 +141,7 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen }) {
 
   const handleNavClick = (e, targetHash) => {
     e.preventDefault();
-    
+
     if (!isHome) {
       navigate(`/${targetHash}`);
       return;
@@ -165,15 +165,15 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen }) {
             <img src={imgSrc(content.logo)} alt={content.brand} className="w-9 h-9 2xl:w-12 2xl:h-12 rounded-full object-cover shrink-0" />
             <span>{content.brand}</span>
           </Link>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8 2xl:gap-12 font-jp">
             {primaryLinks.map((link) => (
               link.to.startsWith('#') ? (
-                <a 
-                  key={link.label} 
-                  href={`/${link.to}`} 
-                  onClick={(e) => handleNavClick(e, link.to)} 
+                <a
+                  key={link.label}
+                  href={`/${link.to}`}
+                  onClick={(e) => handleNavClick(e, link.to)}
                   className="text-sm 2xl:text-lg font-medium text-paper/75 hover:text-gold transition-colors"
                 >
                   {link.label}
@@ -201,13 +201,13 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen }) {
         <button aria-label="Close" onClick={() => setMobileOpen(false)} className="absolute top-6 right-6 text-3xl font-light">×</button>
         {primaryLinks.map((link) => (
           link.to.startsWith('#') ? (
-            <a 
-              key={link.label} 
-              href={`/${link.to}`} 
-              onClick={(e) => { 
-                setMobileOpen(false); 
-                handleNavClick(e, link.to); 
-              }} 
+            <a
+              key={link.label}
+              href={`/${link.to}`}
+              onClick={(e) => {
+                setMobileOpen(false);
+                handleNavClick(e, link.to);
+              }}
               className="text-[clamp(1.25rem,4vw,2rem)] font-serif"
             >
               {link.label}
@@ -349,6 +349,8 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <section className="py-20 md:py-28 2xl:py-36" id="about">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 2xl:gap-24 items-center">
+
+            {/* Gambar */}
             <div className="reveal order-2 lg:order-1 flex justify-center">
               <div className="relative max-w-md lg:max-w-full w-full">
                 <img
@@ -359,14 +361,19 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
               </div>
             </div>
 
+            {/* Konten Teks */}
             <div className="reveal order-1 lg:order-2">
-              <div className="eyebrow mb-3 text-gold 2xl:text-base tracking-widest uppercase font-medium font-jp">
-                {content?.aboutEyebrow}
+              {/* Eyebrow */}
+              <div className="eyebrow mb-4 text-gold text-sm lg:text-base 2xl:text-lg tracking-[0.25em] uppercase font-serif font-semibold">
+                — {content?.aboutEyebrow}
               </div>
-              <p className="text-paper/65 leading-relaxed whitespace-pre-line text-sm md:text-base 2xl:text-xl font-serif italic">
+
+              {/* Full Italic dengan Ukuran & Spasi Maksimal */}
+              <p className="text-paper/90 font-serif italic text-lg lg:text-xl 2xl:text-2xl leading-loose lg:leading-[2] whitespace-pre-line font-normal tracking-wide">
                 {content?.aboutText}
               </p>
             </div>
+
           </div>
         </div>
       </section>
@@ -829,19 +836,73 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
   );
 }
 
-function GalleryPage({ content, katalog, wa, scrolled, mobileOpen, setMobileOpen }) {
+function InstagramCard({ item }) {
+  // Support jika item masih berupa string/object
+  const isObject = typeof item === 'object' && item !== null;
+  const url = isObject ? item.url : item;
+  const image = isObject ? item.image : item;
+  const video = isObject ? item.video : null;
+  const isVideo = isObject && (item.type === 'video' || !!video);
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative block aspect-square w-full overflow-hidden rounded-2xl border border-paper/10 bg-paper/5 transition-all duration-300 hover:border-gold/50"
+    >
+      {/* Tampilan Video atau Gambar */}
+      {isVideo && video ? (
+        <video
+          src={video}
+          poster={image}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <img
+          src={image}
+          alt="Instagram Post"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+        />
+      )}
+
+      {/* Badge Ikon Play / Reel di Pojok Kanan Atas (Persis seperti IG) */}
+      {isVideo && (
+        <div className="absolute top-3 right-3 bg-ink/70 backdrop-blur-md p-1.5 rounded-full text-paper z-10">
+          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      )}
+
+      {/* Overlay Gelap + Ikon Instagram Saat Hover */}
+      <div className="absolute inset-0 bg-ink/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-center justify-center p-4 z-20">
+        <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 flex items-center gap-2 text-gold font-jp text-sm font-semibold">
+          <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+          </svg>
+          <span>View Post</span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function GalleryPage({ content, instagramPosts, katalog, wa, scrolled, mobileOpen, setMobileOpen }) {
   useReveal();
-  const galleryList = Array.isArray(katalog) ? katalog : [];
+
+  const posts = Array.isArray(instagramPosts) && instagramPosts.length > 0
+    ? instagramPosts
+    : (Array.isArray(katalog) ? katalog : []);
 
   return (
     <div className="min-h-screen bg-ink text-paper overflow-x-hidden font-jp">
-      <TopNav
-        scrolled={scrolled}
-        content={content}
-        wa={wa}
-        mobileOpen={mobileOpen}
-        setMobileOpen={setMobileOpen}
-      />
+      <TopNav scrolled={scrolled} content={content} wa={wa} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <span id="top" />
 
       <section className="pt-32 pb-20 md:pt-40 md:pb-24 2xl:pt-48 2xl:pb-36">
@@ -852,37 +913,58 @@ function GalleryPage({ content, katalog, wa, scrolled, mobileOpen, setMobileOpen
               Our <span className="text-gold italic">Gallery</span>
             </h1>
             <p className="text-paper/60 mt-4 text-sm md:text-base 2xl:text-xl leading-relaxed font-jp">
-              A glimpse into the authentic dining atmosphere and delicious creations at Uni Sushi.
+              A glimpse into the authentic dining atmosphere and delicious creations directly from our Instagram.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {galleryList.length === 0 ? (
-              <div className="text-center py-16 col-span-full bg-paper/[0.02] border border-paper/10 rounded-2xl">
-                <p className="text-paper/45 text-base 2xl:text-xl font-jp">
-                  There are no photo galleries at this time.
-                </p>
-              </div>
-            ) : (
-              galleryList.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="group relative overflow-hidden rounded-2xl bg-black/40 border border-paper/10 aspect-square shadow-lg"
-                >
-                  <img
-                    src={imgSrc(item.image || item.img || item)}
-                    alt={item.title || `Gallery image ${idx + 1}`}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                    {item.title && <h3 className="text-white font-serif font-semibold text-lg">{item.title}</h3>}
-                    {item.caption && <p className="text-paper/70 text-xs font-jp">{item.caption}</p>}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          {/* SWIPER SLIDER INSTAGRAM */}
+          {posts.length === 0 ? (
+            <div className="text-center py-16 bg-paper/[0.02] border border-paper/10 rounded-2xl">
+              <p className="text-paper/45 text-base 2xl:text-xl font-jp">
+                There are no Instagram posts to show right now.
+              </p>
+            </div>
+          ) : (
+            <div className="w-full relative px-1">
+              <Swiper
+                modules={[Autoplay, Pagination, Navigation]}
+                spaceBetween={20}
+                slidesPerView={1}
+                loop={posts.length > 3}
+                autoplay={{
+                  delay: 3500,
+                  disableOnInteraction: false,
+                  pauseOnMouseEnter: true,
+                }}
+                pagination={{ clickable: true, dynamicBullets: true }}
+                breakpoints={{
+                  640: { slidesPerView: 2, spaceBetween: 20 },
+                  1024: { slidesPerView: 3, spaceBetween: 24 },
+                  1280: { slidesPerView: 4, spaceBetween: 28 },
+                }}
+                className="pb-14 2xl:pb-20"
+              >
+                {posts.map((item, idx) => (
+                  <SwiperSlide key={idx} className="h-auto">
+                    <InstagramCard item={item} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          )}
+
+          {content?.instagram && (
+            <div className="mt-8 text-center">
+              <a
+                href={`https://instagram.com/${content.instagram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-full px-8 py-3.5 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg font-jp"
+              >
+                Follow @{content.instagram} on Instagram
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
@@ -891,13 +973,17 @@ function GalleryPage({ content, katalog, wa, scrolled, mobileOpen, setMobileOpen
   );
 }
 
+
 export { Maintenance, HomePage, MenuPage, GalleryPage, TopNav, PageFooter };
 
 export default function App({ data }) {
+  // Pastikan ambil dari data dengan aman menggunakan optional chaining (?)
   const content = data?.content || {};
   const categories = data?.categories || [];
   const items = data?.items || [];
-  const katalog = data?.katalog || [];
+
+  // Definisikan instagramPosts dengan benar di sini
+  const instagramPosts = data?.instagramPosts || data?.katalog || [];
 
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -920,21 +1006,20 @@ export default function App({ data }) {
 
   return (
     <>
-      {/* Pengaturan CSS Font Global */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Lora:ital,wght@0,400..700;1,400..700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Permanent+Marker&display=swap');
 
-        .font-jp { fontFamily: 'Noto Sans JP', sans-serif; }
-        .font-serif { fontFamily: 'Lora', serif; }
-        .font-caveat { fontFamily: 'Caveat', cursive; }
-        .font-marker { fontFamily: 'Permanent Marker', cursive; }
+        .font-jp { font-family: 'Noto Sans JP', sans-serif; }
+        .font-serif { font-family: 'Lora', serif; }
+        .font-caveat { font-family: 'Caveat', cursive; }
+        .font-marker { font-family: 'Permanent Marker', cursive; }
       `}</style>
 
       <HashRouter>
         <Routes>
           <Route path="/menu" element={<MenuPage content={content} categories={categories} items={items} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
-          <Route path="/gallery" element={<GalleryPage content={content} katalog={katalog} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
-          <Route path="*" element={<HomePage content={content} items={items} katalog={katalog} data={data} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
+          <Route path="/gallery" element={<GalleryPage content={content} instagramPosts={instagramPosts} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
+          <Route path="*" element={<HomePage content={content} items={items} katalog={instagramPosts} data={data} wa={wa} scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />} />
         </Routes>
       </HashRouter>
     </>

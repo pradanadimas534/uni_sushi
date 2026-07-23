@@ -65,17 +65,61 @@ export const DEV_DATA = {
     { id: 26, categories: 10, name: 'Salmon Mentai', image: '/images/salmon_mentai_roll.jpg', isFeatured: true },
     { id: 27, name: 'Cosmic Colanda', image: '/images/cosmic_colanda.jpg' }
   ],
-  // gallery: [
-  //   { id: 1, image: '/images/IMG_3696.jpg',},
-  //   { id: 2, image: '/images/IMG_6304.jpg'},
-  //   { id: 3, image: '/images/IMG_6306.jpg'},
-  //   { id: 4, image: '/images/IMG_6328.jpg'},
-  //   { id: 5, image: '/images/IMG_6462.jpg'},
-  //   { id: 6, image: '/images/IMG_6539.jpg'},
-  //   { id: 7, image: '/images/IMG_6710.jpg'},
-  //   { id: 8, image: '/images/IMG_6711.jpg'},
-  //   { id: 9, image: '/images/IMG_6712.jpg'}
-  // ],
+
+
+  instagramPosts: [
+    { image: '/images/Gallery 1.jpg',
+      url: 'https://www.instagram.com/p/DbHfnnIzl93/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { video: '/images/Gallery 2.mp4',
+      url: 'https://www.instagram.com/reel/Dat7VpuyLPY/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { video: '/images/gallery 3.mp4',
+      url: 'https://www.instagram.com/reel/Da7dwKnu1eW/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { image: '/images/gallery 4.jpg',
+      url: 'https://www.instagram.com/p/Da7bTOFOKbX/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { image: '/images/gallery 5.jpg',
+      url: 'https://www.instagram.com/p/Dax01IfuZJs/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { image: '/images/gallery 6.jpg',
+      url: 'https://www.instagram.com/p/DanccCSmpxc/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { image: '/images/gallery 7.jpg',
+      url: 'https://www.instagram.com/p/DanccCSmpxc/?img_index=2'
+    },
+    { image: '/images/gallery 8.jpg',
+      url: 'https://www.instagram.com/p/DanccCSmpxc/?img_index=3'
+    },
+    { image: '/images/gallery 9.jpg',
+      url: 'https://www.instagram.com/p/DanccCSmpxc/?img_index=4'
+    },
+    { image: '/images/gallery 10.jpg',
+      url: 'https://www.instagram.com/p/DanccCSmpxc/?img_index=5'
+    },
+    { video: '/images/gallery 11.mp4',
+      url: 'https://www.instagram.com/reel/Dai2GBmJJgD/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { video: '/images/gallery 12.mp4',
+      url: 'https://www.instagram.com/reel/DaizdBtPu2d/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { video: '/images/gallery 13.mp4',
+      url: 'https://www.instagram.com/reel/Daid5WjJje5/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { image: '/images/gallery 15.jpg',
+      url: 'https://www.instagram.com/p/DUUno4tE7FN/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { video: '/images/gallery 16.mp4',
+      url: 'https://www.instagram.com/reel/DScYLM6E8ln/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { image: '/images/gallery 17.webp',
+      url: 'https://www.instagram.com/p/DP3cOuUE2db/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    },
+    { image: '/images/gallery 18.webp',
+      url: 'https://www.instagram.com/p/DPc-mlKk5o5/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    }
+  ],
 
   faqData: [
     {
