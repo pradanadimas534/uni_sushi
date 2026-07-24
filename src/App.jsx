@@ -108,13 +108,22 @@ function ElfsightReviews() {
       script.id = scriptId;
       script.src = 'https://elfsightcdn.com/platform.js';
       script.async = true;
+      script.defer = true; // Mengoptimalkan urutan eksekusi browser
       document.body.appendChild(script);
     }
+
+    // Fungsi pembersih saat komponen dilepas (unmount)
+    return () => {
+      // Jika widget tidak digunakan di halaman lain, hilangkan dari DOM
+      if (script && script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
   }, []);
 
   return (
     <div
-      className="elfsight-app-88a07733-6995-46aa-872b-7ad4c9c0659b w-full overflow-hidden"
+      className="elfsight-app-88a07733-6995-46aa-872b-7ad4c9c0659b w-full overflow-hidden min-h-[250px]"
       data-elfsight-app-lazy
     />
   );
@@ -125,14 +134,12 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 1. Cek apakah pengguna berada di Homepage ('/')
   const isHome = location.pathname === '/';
 
-  // 2. Jika di Home, arahkan 'Menu' ke '#best-seller'. Jika di luar Home, arahkan ke '/menu'
   const primaryLinks = [
     { label: 'Home', to: '#top' },
     { label: 'Our Story', to: '#about' },
-    { label: 'Menu', to: isHome ? '#menu-highlight' : '/menu' }, // <-- PENYESUAIAN DI SINI
+    { label: 'Menu', to: isHome ? '#menu-highlight' : '/menu' },
     { label: 'Reviews', to: '#reviews' },
     { label: 'FAQ', to: '#faq' },
     { label: 'Gallery', to: '/gallery' },
@@ -142,11 +149,22 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen }) {
   const handleNavClick = (e, targetHash) => {
     e.preventDefault();
 
+    // 1. Jika pengguna TIDAK berada di Homepage ('/')
     if (!isHome) {
-      navigate(`/${targetHash}`);
+      // Pindah ke Homepage dulu
+      navigate('/');
+
+      // Beri sedikit jeda agar komponen Homepage ter-render penuh di DOM
+      setTimeout(() => {
+        const element = document.querySelector(targetHash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100); // 100ms delay aman untuk React melakukan render
       return;
     }
 
+    // 2. Jika pengguna SUDAH berada di Homepage
     if (typeof handleHashScroll === 'function') {
       handleHashScroll(e, targetHash);
     } else {
@@ -224,36 +242,71 @@ function TopNav({ scrolled, content, wa, mobileOpen, setMobileOpen }) {
   );
 }
 
+
 function PageFooter({ content, wa }) {
   return (
     <footer className="bg-black/40 border-t border-paper/10 pt-16 pb-8 2xl:pt-24 2xl:pb-12 font-jp">
       <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 2xl:gap-16 mb-12">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 2xl:gap-16 mb-12">
+
+          {/* Brand Info */}
+          <div className="sm:col-span-2 md:col-span-1">
             <div className="font-serif text-xl 2xl:text-2xl font-semibold flex items-center gap-3 mb-3">
               <img src={imgSrc(content.logo)} alt={content.brand} className="w-8 h-8 2xl:w-11 2xl:h-11 rounded-full object-cover shrink-0" />
               <span>{content.brand}</span>
             </div>
-            <p className="text-paper/55 text-sm 2xl:text-base max-w-xs 2xl:max-w-md leading-relaxed">{content.heroLede}</p>
+            <p className="text-paper/55 text-sm 2xl:text-base max-w-xs leading-relaxed">{content.heroLede}</p>
           </div>
+
+          {/* Navigation */}
           <div>
-            <h4 className="text-xs 2xl:text-sm uppercase tracking-wide text-gold font-semibold mb-4">Explore</h4>
-            <div className="flex flex-col gap-2 2xl:gap-3">
-              <Link to="/" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Home</Link>
-              <Link to="/menu" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Menu</Link>
-              <Link to="/gallery" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Gallery</Link>
-              <a href="#reviews" onClick={(e) => handleHashScroll(e, '#reviews')} className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Reviews</a>
+            <h4 className="text-xs 2xl:text-sm uppercase tracking-wider text-gold font-semibold mb-4">Explore</h4>
+            <div className="flex flex-col gap-2.5 2xl:gap-3">
+              <Link to="/" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors w-fit">Home</Link>
+              <Link to="/menu" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors w-fit">Menu</Link>
+              <Link to="/gallery" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors w-fit">Gallery</Link>
+              <a href="#reviews" onClick={(e) => handleHashScroll(e, '#reviews')} className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors w-fit">Reviews</a>
             </div>
           </div>
+
+          {/* Connect */}
           <div>
-            <h4 className="text-xs 2xl:text-sm uppercase tracking-wide text-gold font-semibold mb-4">Connect</h4>
-            <div className="flex flex-col gap-2 2xl:gap-3">
-              <a href={wa} className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">WhatsApp</a>
-              <a href={`https://instagram.com/${content.instagram || ''}`} className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Instagram</a>
-              <a href={`mailto:${content.email || ''}`} className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors">Email</a>
+            <h4 className="text-xs 2xl:text-sm uppercase tracking-wider text-gold font-semibold mb-4">Connect</h4>
+            <div className="flex flex-col gap-2.5 2xl:gap-3">
+              <a href={wa} target="_blank" rel="noopener noreferrer" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors w-fit">WhatsApp</a>
+              <a href={`https://instagram.com/${content.instagram || ''}`} target="_blank" rel="noopener noreferrer" className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors w-fit">Instagram</a>
+              <a href={`mailto:${content.email || ''}`} className="text-paper/65 text-sm 2xl:text-base hover:text-gold transition-colors w-fit">Email</a>
             </div>
           </div>
+
+          {/* Order for Delivery */}
+          <div>
+            <h4 className="text-xs 2xl:text-sm uppercase tracking-wider text-gold font-semibold mb-4">Order Delivery</h4>
+            <div className="flex flex-col gap-2.5">
+              <a
+                href={content.grabUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-between px-3.5 py-2 rounded-xl bg-paper/[0.04] border border-paper/10 hover:border-gold/50 hover:bg-paper/[0.08] text-paper/80 hover:text-gold text-xs 2xl:text-sm font-medium transition-all group"
+              >
+                <span>GrabFood</span>
+                <span className="text-gold/60 group-hover:translate-x-0.5 transition-transform">↗</span>
+              </a>
+              <a
+                href={content.gojekUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-between px-3.5 py-2 rounded-xl bg-paper/[0.04] border border-paper/10 hover:border-gold/50 hover:bg-paper/[0.08] text-paper/80 hover:text-gold text-xs 2xl:text-sm font-medium transition-all group"
+              >
+                <span>GoFood</span>
+                <span className="text-gold/60 group-hover:translate-x-0.5 transition-transform">↗</span>
+              </a>
+            </div>
+          </div>
+
         </div>
+
+        {/* Bottom Copyright */}
         <div className="border-t border-paper/10 pt-6 flex flex-wrap items-center justify-between gap-3 text-xs 2xl:text-sm text-paper/45">
           <span>© {new Date().getFullYear()} {content.brand} · Kuta, Bali</span>
         </div>
@@ -261,6 +314,7 @@ function PageFooter({ content, wa }) {
     </footer>
   );
 }
+
 
 function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, setMobileOpen }) {
   useReveal();
@@ -384,14 +438,17 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <section className="py-20 md:py-28 2xl:py-36 bg-black/40 overflow-hidden" id="menu-highlight">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-4">
-            <div className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase font-jp">
+            {/* Font Eyebrow diperbesar */}
+            <div className="eyebrow flex justify-center mb-3 text-gold text-xs sm:text-sm md:text-base 2xl:text-lg tracking-widest font-bold uppercase font-jp">
               MOST ORDERED
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-bold text-white font-serif">
+            {/* Font Judul H2 diperbesar */}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-bold text-white font-serif">
               Best Seller <span className="text-gold italic">Menu</span>
             </h2>
           </div>
-          <p className="reveal text-center text-paper/55 text-sm 2xl:text-lg max-w-lg 2xl:max-w-2xl mx-auto mb-12 2xl:mb-16">
+          {/* Font Deskripsi Subtitle diperbesar */}
+          <p className="reveal text-center text-paper/60 text-base sm:text-lg 2xl:text-2xl max-w-lg 2xl:max-w-2xl mx-auto mb-12 2xl:mb-16 font-jp">
             Crowd-pleasing favorites made with bold flavors and fresh ingredients.
           </p>
 
@@ -407,104 +464,126 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
             );
 
             if (featuredMenu.length === 0) {
-              return <p className="text-center text-paper/45 2xl:text-lg">Belum ada menu populer / best seller saat ini.</p>;
+              return <p className="text-center text-paper/45 text-base sm:text-lg 2xl:text-xl">Belum ada menu populer / best seller saat ini.</p>;
             }
 
             return (
               <div className="flex flex-col items-center gap-10 2xl:gap-14">
                 <div className="w-full relative px-1">
-                  <Swiper
-                    modules={[Autoplay, Pagination, Navigation]}
-                    spaceBetween={24}
-                    slidesPerView={1}
-                    loop={featuredMenu.length > 3}
-                    autoplay={{
-                      delay: 3500,
-                      disableOnInteraction: false,
-                      pauseOnMouseEnter: true,
-                    }}
-                    pagination={{ clickable: true, dynamicBullets: true }}
-                    breakpoints={{
-                      640: { slidesPerView: 2, spaceBetween: 20 },
-                      1024: { slidesPerView: 3, spaceBetween: 28 },
-                      1536: { slidesPerView: 4, spaceBetween: 32 },
-                    }}
-                    className="pb-14 2xl:pb-20"
-                  >
-                    {featuredMenu.map((it, index) => {
-                      const itemWa = typeof wa !== 'undefined'
-                        ? wa
-                        : `https://wa.me/6281234567890?text=Halo,%20saya%20ingin%20pesan%20${encodeURIComponent(it.name || 'Menu')}`;
+                  {Array.isArray(featuredMenu) && featuredMenu.length > 0 && (
+                    <Swiper
+                      modules={[Autoplay, Pagination, Navigation]}
+                      spaceBetween={24}
+                      slidesPerView={1}
+                      loop={featuredMenu.length > 3}
+                      autoplay={{
+                        delay: 3500,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                      }}
+                      pagination={{ clickable: true, dynamicBullets: true }}
+                      breakpoints={{
+                        640: { slidesPerView: 2, spaceBetween: 20 },
+                        1024: { slidesPerView: 3, spaceBetween: 28 },
+                        1536: { slidesPerView: 4, spaceBetween: 32 },
+                      }}
+                      className="pb-14 2xl:pb-20"
+                    >
+                      {featuredMenu.map((it, index) => {
+                        // 1. Penanganan fallback WhatsApp Link
+                        const itemName = it.name || 'Menu';
+                        const itemWa = typeof wa === 'string' && wa.length > 0
+                          ? wa
+                          : `https://wa.me/6281234567890?text=Halo,%20saya%20ingin%20pesan%20${encodeURIComponent(itemName)}`;
 
-                      return (
-                        <SwiperSlide key={it.id || index} className="h-auto">
-                          <div className="group relative flex flex-col justify-between h-full rounded-2xl overflow-hidden bg-paper/[0.03] border border-paper/10 hover:border-gold/50 transition-all duration-300 shadow-xl">
-                            <div className="relative w-full aspect-[4/3] sm:aspect-[4/5] overflow-hidden bg-black/40">
-                              {it.image || it.img ? (
-                                <img
-                                  src={typeof imgSrc === 'function' ? imgSrc(it.image || it.img) : (it.image || it.img)}
-                                  alt={it.name || 'Menu Item'}
-                                  loading="lazy"
-                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center text-paper/30">
-                                  <span className="text-4xl 2xl:text-6xl mb-2">
-                                    {typeof emojiFor === 'function' ? emojiFor(it.name) : '🍽️'}
-                                  </span>
-                                  <span className="text-xs 2xl:text-sm">Gambar Tidak Tersedia</span>
-                                </div>
-                              )}
+                        // 2. Evaluasi Gambar & Emoji
+                        const imageSrc = typeof imgSrc === 'function'
+                          ? imgSrc(it.image || it.img)
+                          : (it.image || it.img);
 
-                              <span className="absolute top-3 right-3 bg-gold text-ink text-[10px] 2xl:text-xs font-bold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full shadow-lg border border-paper/20 uppercase tracking-wider font-jp">
-                                ★ Best Seller
-                              </span>
+                        const emoji = typeof emojiFor === 'function' ? emojiFor(itemName) : '🍽️';
 
-                              {it.category && (
-                                <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-gold text-[10px] 2xl:text-xs font-semibold px-2.5 py-1 2xl:px-3.5 2xl:py-1.5 rounded-full border border-gold/20 font-jp">
-                                  {it.category}
+                        // 3. Format Harga
+                        const formattedPrice = typeof it.price === 'number'
+                          ? `Rp ${it.price.toLocaleString('id-ID')}`
+                          : it.price;
+
+                        return (
+                          <SwiperSlide key={it.id || index} className="h-auto">
+                            <div className="group relative flex flex-col justify-between h-full rounded-2xl overflow-hidden bg-paper/[0.03] border border-paper/10 hover:border-gold/50 transition-all duration-300 shadow-xl">
+
+                              {/* Image Container */}
+                              <div className="relative w-full aspect-[4/3] sm:aspect-[4/5] overflow-hidden bg-black/40">
+                                {imageSrc ? (
+                                  <img
+                                    src={imageSrc}
+                                    alt={itemName}
+                                    loading="lazy"
+                                    decoding="async"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex flex-col items-center justify-center text-paper/30">
+                                    <span className="text-5xl 2xl:text-7xl mb-2">{emoji}</span>
+                                    <span className="text-sm 2xl:text-base">Gambar Tidak Tersedia</span>
+                                  </div>
+                                )}
+
+                                {/* Badges */}
+                                <span className="absolute top-3 right-3 bg-gold text-ink text-xs 2xl:text-sm font-bold px-3 py-1.5 2xl:px-4 2xl:py-2 rounded-full shadow-lg border border-paper/20 uppercase tracking-wider font-jp">
+                                  ★ Best Seller
                                 </span>
-                              )}
-                            </div>
 
-                            <div className="p-5 2xl:p-7 flex-1 flex flex-col justify-between bg-black/30">
-                              <div>
-                                <div className="flex justify-between items-start gap-2 mb-2">
-                                  <h3 className="font-semibold text-base 2xl:text-xl text-white group-hover:text-gold transition-colors line-clamp-1 font-serif">
-                                    {it.name || 'Nama Menu'}
-                                  </h3>
-                                  {it.price && (
-                                    <span className="text-gold font-bold text-sm 2xl:text-lg whitespace-nowrap font-jp">
-                                      {typeof it.price === 'number' ? `Rp ${it.price.toLocaleString('id-ID')}` : it.price}
-                                    </span>
-                                  )}
-                                </div>
-                                {it.description && (
-                                  <p className="text-paper/60 text-xs 2xl:text-sm line-clamp-2 mb-4 font-jp">
-                                    {it.description}
-                                  </p>
+                                {it.category && (
+                                  <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-gold text-xs 2xl:text-sm font-semibold px-3 py-1.5 2xl:px-4 2xl:py-2 rounded-full border border-gold/20 font-jp">
+                                    {it.category}
+                                  </span>
                                 )}
                               </div>
 
-                              <a
-                                href={itemWa}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full py-2.5 2xl:py-3.5 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-xs 2xl:text-sm transition-all text-center block mt-2 font-jp"
-                              >
-                                Reserve via WhatsApp
-                              </a>
+                              {/* Content Container */}
+                              <div className="p-6 2xl:p-8 flex-1 flex flex-col justify-between bg-black/30">
+                                <div>
+                                  <div className="flex justify-between items-start gap-2 mb-3">
+                                    <h3 className="font-semibold text-lg sm:text-xl 2xl:text-2xl text-white group-hover:text-gold transition-colors line-clamp-1 font-serif">
+                                      {itemName}
+                                    </h3>
+                                    {formattedPrice && (
+                                      <span className="text-gold font-bold text-base sm:text-lg 2xl:text-xl whitespace-nowrap font-jp">
+                                        {formattedPrice}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {it.description && (
+                                    <p className="text-paper/70 text-sm sm:text-base 2xl:text-lg line-clamp-2 mb-5 font-jp">
+                                      {it.description}
+                                    </p>
+                                  )}
+                                </div>
+
+                                {/* Action Button */}
+                                <a
+                                  href={itemWa}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full py-3 2xl:py-4 rounded-full bg-gold/10 hover:bg-gold text-gold hover:text-ink border border-gold/30 font-semibold text-sm sm:text-base 2xl:text-lg transition-all text-center block mt-2 font-jp"
+                                >
+                                  Book Now
+                                </a>
+                              </div>
+
                             </div>
-                          </div>
-                        </SwiperSlide>
-                      );
-                    })}
-                  </Swiper>
+                          </SwiperSlide>
+                        );
+                      })}
+                    </Swiper>
+                  )}
                 </div>
 
                 <Link
                   to="/menu"
-                  className="inline-flex items-center justify-center rounded-full px-8 py-3.5 2xl:px-12 2xl:py-4.5 text-sm 2xl:text-base font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg font-jp"
+                  className="inline-flex items-center justify-center rounded-full px-9 py-4 2xl:px-14 2xl:py-5 text-base sm:text-lg 2xl:text-xl font-bold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg font-jp"
                 >
                   See Full Menu
                 </Link>
@@ -520,10 +599,10 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <section className="py-20 md:py-28 2xl:py-36 bg-black/25 overflow-hidden" id="reviews">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-10">
-            <div className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase font-jp">
+            <div className="eyebrow flex justify-center mb-3 text-gold text-xs sm:text-sm md:text-base 2xl:text-lg tracking-widest font-bold uppercase font-jp">
               Google Reviews
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold text-paper font-serif">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-semibold text-paper font-serif">
               What Our <span className="text-gold italic">Customers Say</span>
             </h2>
           </div>
@@ -538,11 +617,11 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       {/* FAQ SECTION */}
       <section className="py-16 md:py-24 bg-[#121212] text-paper font-jp" id="faq">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase">
+          <div className="eyebrow flex justify-center mb-3 text-gold text-xs sm:text-sm md:text-base 2xl:text-lg tracking-widest font-bold uppercase">
             Got Questions?
           </div>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-white mb-12 font-serif">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-bold text-center text-white mb-12 font-serif">
             Frequently Asked <span className="text-[#FF5722] italic">Questions</span>
           </h2>
 
@@ -556,14 +635,14 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
                 >
                   <button
                     onClick={() => toggleFAQ(index)}
-                    className="w-full flex items-center justify-between p-5 text-left text-base sm:text-lg font-medium text-paper hover:text-gold transition-colors focus:outline-none"
+                    className="w-full flex items-center justify-between p-6 text-left text-lg sm:text-xl 2xl:text-2xl font-medium text-paper hover:text-gold transition-colors focus:outline-none"
                   >
                     <span>{item.q}</span>
-                    <ChevronDown className={`ml-4 text-gold text-sm transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`ml-4 text-gold text-base 2xl:text-xl transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {isOpen && (
-                    <div className="px-5 pb-5 pt-1 text-sm sm:text-base text-paper/80 leading-relaxed border-t border-white/5">
+                    <div className="px-6 pb-6 pt-2 text-base sm:text-lg 2xl:text-xl text-paper/80 leading-relaxed border-t border-white/5">
                       {item.a}
                     </div>
                   )}
@@ -580,57 +659,57 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
       <section className="py-20 md:py-28 2xl:py-36 font-jp" id="visit">
         <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center max-w-xl 2xl:max-w-3xl mx-auto mb-12">
-            <div className="eyebrow flex justify-center mb-3 text-gold 2xl:text-base tracking-widest font-medium uppercase">
+            <div className="eyebrow flex justify-center mb-3 text-gold text-xs sm:text-sm md:text-base 2xl:text-lg tracking-widest font-bold uppercase">
               Come Say Hi
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-semibold font-serif">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-semibold font-serif">
               Visit <span className="text-gold italic">Us</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 2xl:gap-16 items-start">
-            <div className="reveal space-y-6 2xl:space-y-8">
+            <div className="reveal space-y-7 2xl:space-y-9">
               <div className="flex gap-4 items-start">
-                <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><MapPin size={18} className="2xl:w-6 2xl:h-6" /></div>
+                <div className="w-12 h-12 2xl:w-14 2xl:h-14 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><MapPin size={22} className="2xl:w-7 2xl:h-7" /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Location</div>
-                  <div className="text-sm 2xl:text-base text-paper/60">{content.address}</div>
+                  <div className="font-serif font-semibold mb-1 text-lg sm:text-xl 2xl:text-2xl">Location</div>
+                  <div className="text-base sm:text-lg 2xl:text-xl text-paper/70">{content.address}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Phone size={18} className="2xl:w-6 2xl:h-6" /></div>
+                <div className="w-12 h-12 2xl:w-14 2xl:h-14 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Phone size={22} className="2xl:w-7 2xl:h-7" /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Phone</div>
-                  <div className="text-sm 2xl:text-base text-paper/60">{content.phone}</div>
+                  <div className="font-serif font-semibold mb-1 text-lg sm:text-xl 2xl:text-2xl">Phone</div>
+                  <div className="text-base sm:text-lg 2xl:text-xl text-paper/70">{content.phone}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Mail size={18} className="2xl:w-6 2xl:h-6" /></div>
+                <div className="w-12 h-12 2xl:w-14 2xl:h-14 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Mail size={22} className="2xl:w-7 2xl:h-7" /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Email</div>
-                  <div className="text-sm 2xl:text-base text-paper/60">{content.email}</div>
+                  <div className="font-serif font-semibold mb-1 text-lg sm:text-xl 2xl:text-2xl">Email</div>
+                  <div className="text-base sm:text-lg 2xl:text-xl text-paper/70">{content.email}</div>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Clock size={18} className="2xl:w-6 2xl:h-6" /></div>
+                <div className="w-12 h-12 2xl:w-14 2xl:h-14 rounded-full bg-gold/15 flex items-center justify-center shrink-0 text-gold mt-1"><Clock size={22} className="2xl:w-7 2xl:h-7" /></div>
                 <div>
-                  <div className="font-serif font-semibold mb-1 2xl:text-xl">Opening Hours</div>
+                  <div className="font-serif font-semibold mb-1 text-lg sm:text-xl 2xl:text-2xl">Opening Hours</div>
                   {(content.hours || []).map((h, i) => {
                     const label = h.d || h.day || h.label || 'Hours';
                     const value = h.h || h.time || h.hours || '';
-                    return <div className="text-sm 2xl:text-base text-paper/60" key={i}>{label}: <span className="text-paper/80">{value}</span></div>;
+                    return <div className="text-base sm:text-lg 2xl:text-xl text-paper/70" key={i}>{label}: <span className="text-paper/90 font-medium">{value}</span></div>;
                   })}
                 </div>
               </div>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <a href={wa} className="inline-flex items-center justify-center rounded-full px-6 py-3 2xl:px-8 2xl:py-4 text-sm 2xl:text-base font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors">WhatsApp</a>
-                <a href={`https://instagram.com/${content.instagram || ''}`} className="inline-flex items-center justify-center rounded-full px-6 py-3 2xl:px-8 2xl:py-4 text-sm 2xl:text-base font-semibold border border-paper/25 text-paper hover:border-paper/50 transition-colors">@{content.instagram}</a>
+              <div className="flex flex-wrap gap-4 pt-3">
+                <a href={wa} className="inline-flex items-center justify-center rounded-full px-7 py-3.5 2xl:px-9 2xl:py-4 text-base sm:text-lg 2xl:text-xl font-bold bg-gold text-ink hover:bg-gold/85 transition-colors">WhatsApp</a>
+                <a href={`https://instagram.com/${content.instagram || ''}`} className="inline-flex items-center justify-center rounded-full px-7 py-3.5 2xl:px-9 2xl:py-4 text-base sm:text-lg 2xl:text-xl font-bold border border-paper/25 text-paper hover:border-paper/50 transition-colors">@{content.instagram}</a>
               </div>
             </div>
-            <div className="reveal rounded-2xl overflow-hidden bg-black/40 border border-paper/10 h-[350px] sm:h-[400px] 2xl:h-[500px] relative w-full">
+            <div className="reveal rounded-2xl overflow-hidden bg-black/40 border border-paper/10 h-[380px] sm:h-[450px] 2xl:h-[550px] relative w-full">
               <iframe
                 title="Location"
                 className="absolute inset-0 w-full h-full border-0"
-                src={`https://www.google.com/maps?q=${encodeURIComponent('UNI SUSHI ASIAN FUSION' || content.mapsQuery || content.address)}&output=embed`}
+                src={`https://maps.google.com/maps?width=600&height=400&hl=en&q=UNI%20Sport%20Bar%20Caf%C3%A9&t=&z=14&ie=UTF8&iwloc=B&output=embed`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
@@ -638,7 +717,6 @@ function HomePage({ content, items, katalog, data, wa, scrolled, mobileOpen, set
           </div>
         </div>
       </section>
-
       <PageFooter content={content} wa={wa} />
     </div>
   );
@@ -706,17 +784,27 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
 
           {/* TAB BAR FILTER KATEGORI */}
           <div className="relative max-w-5xl 2xl:max-w-7xl mx-auto mb-10 2xl:mb-16 px-2 md:px-8">
+            {/* Tombol Kiri */}
             <button
               onClick={() => scroll('left')}
               aria-label="Scroll left"
-              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 2xl:w-12 2xl:h-12 items-center justify-center rounded-full bg-gold/90 text-ink hover:bg-gold shadow-md transition-transform hover:scale-110 2xl:text-xl font-bold"
+              className="hidden md:flex absolute -left-2 top-1/2 -translate-y-1/2 z-10 items-center justify-center text-gold hover:text-gold/80 transition-transform hover:scale-125 p-1 focus:outline-none"
             >
-              ‹
+              <svg
+                className="w-6 h-6 2xl:w-8 2xl:h-8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
 
+            {/* Container List Kategori */}
             <div
               ref={scrollRef}
-              className="flex items-center gap-2 2xl:gap-4 overflow-x-auto py-2 px-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden scroll-smooth font-jp"
+              className="flex items-center gap-2 2xl:gap-4 overflow-x-auto py-2 px-2 md:px-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden scroll-smooth font-jp"
             >
               {categoriesList.map((cat) => {
                 const isActive = selectedCategory === cat.id;
@@ -735,12 +823,21 @@ function MenuPage({ content, categories: propsCategories, items, wa, scrolled, m
               })}
             </div>
 
+            {/* Tombol Kanan */}
             <button
               onClick={() => scroll('right')}
               aria-label="Scroll right"
-              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 2xl:w-12 2xl:h-12 items-center justify-center rounded-full bg-gold/90 text-ink hover:bg-gold shadow-md transition-transform hover:scale-110 2xl:text-xl font-bold"
+              className="hidden md:flex absolute -right-2 top-1/2 -translate-y-1/2 z-10 items-center justify-center text-gold hover:text-gold/80 transition-transform hover:scale-125 p-1 focus:outline-none"
             >
-              ›
+              <svg
+                className="w-6 h-6 2xl:w-8 2xl:h-8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
 
@@ -905,10 +1002,11 @@ function GalleryPage({ content, instagramPosts, katalog, wa, scrolled, mobileOpe
       <TopNav scrolled={scrolled} content={content} wa={wa} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <span id="top" />
 
-      <section className="pt-32 pb-20 md:pt-40 md:pb-24 2xl:pt-48 2xl:pb-36">
-        <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="reveal text-center max-w-2xl 2xl:max-w-4xl mx-auto mb-12 2xl:mb-16">
-            <div className="eyebrow justify-center flex mb-3 2xl:text-base font-jp">Moments & Vibe</div>
+      <section className="pt-28 pb-16 md:pt-40 md:pb-24 2xl:pt-48 2xl:pb-36">
+        <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="reveal text-center max-w-2xl 2xl:max-w-4xl mx-auto mb-10 2xl:mb-16">
+            <div className="eyebrow justify-center flex mb-3 2xl:text-base font-jp">Moments & Vibe
+            </div>
             <h1 className="text-3xl md:text-4xl 2xl:text-5xl font-semibold font-serif">
               Our <span className="text-gold italic">Gallery</span>
             </h1>
@@ -917,49 +1015,30 @@ function GalleryPage({ content, instagramPosts, katalog, wa, scrolled, mobileOpe
             </p>
           </div>
 
-          {/* SWIPER SLIDER INSTAGRAM */}
+          {/* GALERI GRID 2 KOLOM KE BAWAH */}
           {posts.length === 0 ? (
-            <div className="text-center py-16 bg-paper/[0.02] border border-paper/10 rounded-2xl">
-              <p className="text-paper/45 text-base 2xl:text-xl font-jp">
+            <div className="text-center py-12 sm:py-16 bg-paper/[0.02] border border-paper/10 rounded-2xl">
+              <p className="text-paper/45 text-xs sm:text-base 2xl:text-xl font-jp">
                 There are no Instagram posts to show right now.
               </p>
             </div>
           ) : (
-            <div className="w-full relative px-1">
-              <Swiper
-                modules={[Autoplay, Pagination, Navigation]}
-                spaceBetween={20}
-                slidesPerView={1}
-                loop={posts.length > 3}
-                autoplay={{
-                  delay: 3500,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: true,
-                }}
-                pagination={{ clickable: true, dynamicBullets: true }}
-                breakpoints={{
-                  640: { slidesPerView: 2, spaceBetween: 20 },
-                  1024: { slidesPerView: 3, spaceBetween: 24 },
-                  1280: { slidesPerView: 4, spaceBetween: 28 },
-                }}
-                className="pb-14 2xl:pb-20"
-              >
-                {posts.map((item, idx) => (
-                  <SwiperSlide key={idx} className="h-auto">
-                    <InstagramCard item={item} />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
+              {posts.map((item, idx) => (
+                <div key={idx} className="w-full">
+                  <InstagramCard item={item} />
+                </div>
+              ))}
             </div>
           )}
 
           {content?.instagram && (
-            <div className="mt-8 text-center">
+            <div className="mt-8 sm:mt-12 text-center">
               <a
                 href={`https://instagram.com/${content.instagram}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-full px-8 py-3.5 text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg font-jp"
+                className="inline-flex items-center justify-center rounded-full px-6 py-2.5 sm:px-8 sm:py-3.5 text-xs sm:text-sm font-semibold bg-gold text-ink hover:bg-gold/85 transition-colors shadow-lg font-jp"
               >
                 Follow @{content.instagram} on Instagram
               </a>
@@ -972,7 +1051,6 @@ function GalleryPage({ content, instagramPosts, katalog, wa, scrolled, mobileOpe
     </div>
   );
 }
-
 
 export { Maintenance, HomePage, MenuPage, GalleryPage, TopNav, PageFooter };
 
@@ -989,10 +1067,20 @@ export default function App({ data }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener('scroll', onScroll);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 60);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
 
   useEffect(() => {
     if (content.brand) document.title = `${content.brand} — Restaurant & Bar in Kuta, Bali`;
@@ -1007,8 +1095,6 @@ export default function App({ data }) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Lora:ital,wght@0,400..700;1,400..700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=Permanent+Marker&display=swap');
-
         .font-jp { font-family: 'Noto Sans JP', sans-serif; }
         .font-serif { font-family: 'Lora', serif; }
         .font-caveat { font-family: 'Caveat', cursive; }
